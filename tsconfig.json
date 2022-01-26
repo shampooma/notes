@@ -1,0 +1,7 @@
+{
+    "compilerOptions": {
+        "strict": true,
+        "jsx": "react", // Set for src/pages/index.tsx | Module './index_class' was resolved to '/mnt/e/work/notes/src/pages/index_class.tsx', but '--jsx' is not set.
+        "baseUrl": "src",
+    }
+}
