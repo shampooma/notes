@@ -4,8 +4,6 @@
 
 <h1 align="center">Notes</h1>
 
-Contents:
-
 [0. Quick start](../README.md)
 
 <span>1. Development</span>
@@ -42,7 +40,7 @@ Contents:
   git clone https://github.com/shampooma/notes.git
   cd notes
   npm ci
-  npm run start  
+  npm run start
   ```
 
 <h2>1.1. Follow the conventions (My own style)</h2>
@@ -65,14 +63,14 @@ src/
 │   ├── index_store.ts
 │   └── Component1/
 │       ├── Component1_enum.ts
-│       ├── Component1_slice.ts 
+│       ├── Component1_slice.ts
 │       ├── Component1_type.ts
 │       ├── Component2_enum.ts
-│       ├── Component2_slice.ts 
+│       ├── Component2_slice.ts
 │       └── Component2_type.ts
 ├── images/  // For images
 │   └── image0.png
-├── pages/  // For pages 
+├── pages/  // For pages
 │   ├── 404.tsx
 │   └── index.tsx
 └── styles/  // For styles
@@ -131,7 +129,7 @@ import { useAppSelector, useAppDispatch } from "others/index_hooks"; // Import h
 import { setState0 } from "others/Component0_slice"; // Import actions
 
 const Component1 = ({ // Define parameters and corresponding data type
-  variable1, 
+  variable1,
 }: {
   variable1: type1,
 }) => {

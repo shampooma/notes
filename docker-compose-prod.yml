@@ -6,4 +6,4 @@ services:
       target: "prod"
     ports:
       - "${PROD_HOST_PORT}:9000"
-    command: sh -c "npm run serve"
+    command: sh -c "npm run serve --prefix-paths"
