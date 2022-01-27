@@ -1,7 +1,7 @@
 name: Test
 on:
   push:
-    branches: [ main ]
+    branches: [ test, dev ]
 jobs:
   build:
     strategy:
