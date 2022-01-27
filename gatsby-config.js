@@ -5,6 +5,7 @@ module.exports = {
   siteMetadata: {
     siteUrl: `https://www.yourdomain.tld`,
   },
+  pathPrefix: '/docs',
   plugins: [
     {
       resolve: `gatsby-plugin-root-import`

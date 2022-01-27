@@ -4,8 +4,6 @@
 
 <h1 align="center">Notes</h1>
 
-Contents:
-
 <span>0. Quick start</span>
 
 [1. Development](./readme/development.md)

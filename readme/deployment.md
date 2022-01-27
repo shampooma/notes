@@ -4,8 +4,6 @@
 
 <h1 align="center">Notes</h1>
 
-Contents:
-
 [0. Quick start](../README.md)
 
 [1. Development](./development.md)
@@ -22,23 +20,25 @@ Contents:
 
   Set `PROCESS_MODE=prod` in `.env`
 
-  ```bash
+  ```sh
   ./start.sh build
-  ./start.sh up -d
-  mkdir docs
-  docker cp notes_prod_1:/app/public/. ./docs/
+  docker run -itd --rm --name notes_prod_container notes_prod sh
+  docker cp notes_prod_container:/app/public/. ./docs/
+  docker kill notes_prod_container
   ```
 
 - Option 1: use npm directly
 
-  ```bash
+  ```sh
+  npm run build --prefix-paths
   mkdir docs
-  npm run build
-  cp -r ./public/* ./build/*
+  cp -r ./public/* ./docs/
   ```
 
 <h2>2.1. Push to GitHub</h2>
 
-```bash
-git push origin main
+```sh
+git add .
+git commit -m "new commit"
+git push origin dev
 ```

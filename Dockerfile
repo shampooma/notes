@@ -14,7 +14,7 @@ COPY gatsby-browser.js \
   tsconfig.json \
   ./
 
-RUN npm ci --production && npm run build
+RUN npm ci --production && npm run build --prefix-paths
 
 CMD []
 
