@@ -14,7 +14,7 @@
 
 <h1 id="0.">0. Quick start</h1>
 
-<h2>0.0. Get the website ready</h2>
+<h2>0.1. Get the site ready</h2>
 
 - Option 0: visit GitHub page
 
@@ -22,8 +22,10 @@
 
 - Option 1: Host the website by docker
 
+  Set `PROCESS_MODE=prod` in `.env`
+
   ```bash
-  git clone https://github.com/shampooma/notes.git
+  git clone -b main https://github.com/shampooma/notes.git
   cd notes
   ./start.sh build
   ./start.sh up -d
@@ -34,7 +36,7 @@
 - Option 2: Host the website directly
 
   ```bash
-  git clone https://github.com/shampooma/notes.git
+  git clone -b main https://github.com/shampooma/notes.git
   cd notes
   npm ci --production
   npm run build

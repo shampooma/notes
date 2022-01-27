@@ -2,7 +2,7 @@ module.exports = {
   siteMetadata: {
     siteUrl: `https://www.yourdomain.tld`,
   },
-  pathPrefix: '/docs',
+  pathPrefix: '/notes/docs',
   plugins: [
     {
       // Allow files in src to import other files without ../../

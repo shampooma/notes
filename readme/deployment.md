@@ -23,6 +23,7 @@
   ```sh
   ./start.sh build
   docker run -itd --rm --name notes_prod_container notes_prod sh
+  mkdir ./docs
   docker cp notes_prod_container:/app/public/. ./docs/
   docker kill notes_prod_container
   ```
@@ -31,7 +32,7 @@
 
   ```sh
   npm run build --prefix-paths
-  mkdir docs
+  mkdir ./docs
   cp -r ./public/* ./docs/
   ```
 
