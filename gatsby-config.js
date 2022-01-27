@@ -1,6 +1,3 @@
-const path = require("path")
-const fs = require("fs")
-
 module.exports = {
   siteMetadata: {
     siteUrl: `https://www.yourdomain.tld`,
@@ -8,13 +5,14 @@ module.exports = {
   pathPrefix: '/docs',
   plugins: [
     {
+      // Allow files in src to import other files without ../../
       resolve: `gatsby-plugin-root-import`
     },
     {
       resolve: `gatsby-plugin-manifest`,
       options: {
-        name: `GatsbyJS`,
-        short_name: `GatsbyJS`,
+        name: `Notes`,
+        short_name: `Notes`,
         start_url: `/`,
         background_color: `#fafffa`,
         theme_color: `#fafffa`,
