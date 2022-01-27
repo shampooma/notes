@@ -14,38 +14,38 @@
 
 <h1 id="1.">1. Development</h1>
 
-> (NOTE) PWA only works for production mode
+> (NOTE) Should use dev branch
 >
-> (NOTE) Used Redux for state management
+> (NOTE) PWA only works for production mode
 
-<h2>1.0. Start server</h2>
+<h2>1.0. Clone git repository</h2>
+
+```sh
+git clone -b dev https://github.com/shampooma/notes.git
+cd notes
+```
+
+<h2>1.1. Start server</h2>
 
 - Option 0: Use docker
 
-  ```bash
-  git clone https://github.com/shampooma/notes.git
-  cd notes
-  ```
-
   Set `PROCESS_MODE=prod` to `PROCESS_MODE=dev` in `.env`
 
-  ```bash
+  ```sh
   ./start.sh build
   ./start.sh up -d
   ```
 
 - Option 1: Start directly
 
-  ```bash
-  git clone https://github.com/shampooma/notes.git
-  cd notes
+  ```sh
   npm ci
   npm run start
   ```
 
-<h2>1.1. Follow the conventions (My own style)</h2>
+<h2>1.2. Follow the conventions (My own style)</h2>
 
-<h3>1.1.0. File structure</h3>
+<h3>1.2.0. File structure</h3>
 
 ```bash
 src/
@@ -77,7 +77,7 @@ src/
     └── style0.css
 ```
 
-<h2>1.1.1. Component_slice.ts</h2>
+<h2>1.2.1. Component_slice.ts</h2>
 
 0. Change the slice (e.g. `Component1_slice.ts`)
     ```ts
@@ -122,7 +122,7 @@ src/
     export type AppDispatch = typeof store.dispatch
     ```
 
-<h2>1.1.2. Component.tsx</h2>
+<h2>1.2.2. Component.tsx</h2>
 
 ```tsx
 import { useAppSelector, useAppDispatch } from "others/index_hooks"; // Import hooks for redux (global state management)
@@ -170,7 +170,7 @@ const Component1 = ({ // Define parameters and corresponding data type
 export default Component1;
 ```
 
-<h2>1.1.3. Component_type.ts</h2>
+<h2>1.2.3. Component_type.ts</h2>
 
 ```ts
 export interface Interface1 {
@@ -178,7 +178,7 @@ export interface Interface1 {
 }
 ```
 
-<h2>1.1.4. Component_enum.ts</h2>
+<h2>1.2.4. Component_enum.ts</h2>
 
 ```ts
 export enum Enum1 {
