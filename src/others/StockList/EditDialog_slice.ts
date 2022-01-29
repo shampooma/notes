@@ -1,16 +1,14 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 export const editDialogSlice = createSlice({
-  name: 'stockList',
+  name: 'editDialog',
   initialState: {
-    // value
     name: "",
     price: "",
     position: "",
     index: -1,
     showDialog: false
   } as {
-    // type
     name: string,
     price: string,
     position: string,
@@ -50,4 +48,4 @@ export const {
   setShowEditDialog
 } = editDialogSlice.actions
 
-export default editDialogSlice.reducer
+export const editDialogReducer = editDialogSlice.reducer

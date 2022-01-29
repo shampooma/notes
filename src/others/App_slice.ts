@@ -21,4 +21,4 @@ export const appSlice = createSlice({
 
 export const { setDb, setLoading } = appSlice.actions;
 
-export default appSlice.reducer;
+export const appReducer = appSlice.reducer;

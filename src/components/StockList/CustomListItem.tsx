@@ -24,7 +24,6 @@ const CustomListItem = ({
   index: number
 }) => {
   // Global state
-  console.log("render CustomListItem.tsx");
   const dispatch = useAppDispatch();
   const {db, items} = useAppSelector((state) => {
     return {

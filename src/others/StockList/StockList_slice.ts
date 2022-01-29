@@ -1,14 +1,12 @@
 import { createSlice, combineReducers } from '@reduxjs/toolkit'
-import {GeneralItem} from "./StockList_type";
-import editDialogReducer from "./EditDialog_slice";
+import { GeneralItem } from "./StockList_type";
+import { editDialogReducer } from "./EditDialog_slice";
 
 export const stockListSlice = createSlice({
   name: 'stockList',
   initialState: {
-    // value
     items: []
   } as {
-    // type
     items: GeneralItem[]
   },
   reducers: {
@@ -30,7 +28,7 @@ export const {
   setItems
 } = stockListSlice.actions
 
-export default combineReducers({
+export const stockListReducer = combineReducers({
   stockList: stockListSlice.reducer,
   editDialog: editDialogReducer
 });

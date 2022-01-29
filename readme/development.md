@@ -18,34 +18,35 @@
 >
 > (NOTE) PWA only works for production mode
 
-<h2>1.0. Clone git repository</h2>
+<h2>1.0. Procedures</h2>
+
+<h3>1.0.0. Clone git repository</h3>
 
 ```sh
 git clone -b dev https://github.com/shampooma/notes.git
 cd notes
 ```
 
-<h2>1.1. Start server</h2>
+<h3 id="1.1.1.">1.0.1. Start server</h3>
 
 - Option 0: Use docker
 
-  Set `PROCESS_MODE=prod` to `PROCESS_MODE=dev` in `.env`
-
   ```sh
+  sed -i 's/PROCESS_MODE=.*/PROCESS_MODE=dev/' .env
   ./start.sh build
   ./start.sh up -d
   ```
 
-- Option 1: Start directly
+- Option 1: Use npm directly
 
   ```sh
   npm ci
   npm run start
   ```
 
-<h2>1.2. Follow the conventions (My own style)</h2>
+<h2>1.1. Hints</h2>
 
-<h3>1.2.0. File structure</h3>
+<h3>1.1.0. File structure</h3>
 
 ```bash
 src/
@@ -54,6 +55,8 @@ src/
 │   └── Component1/
 │       ├── Component1.tsx
 │       └── Component2.tsx
+├── images/  // For images
+│   └── image0.png
 ├── others/  // For *enum.ts, *slice.ts, *type.ts, \
 │   │               and other remaing things
 │   ├── Component0_enum.ts
@@ -68,8 +71,6 @@ src/
 │       ├── Component2_enum.ts
 │       ├── Component2_slice.ts
 │       └── Component2_type.ts
-├── images/  // For images
-│   └── image0.png
 ├── pages/  // For pages
 │   ├── 404.tsx
 │   └── index.tsx
@@ -77,28 +78,36 @@ src/
     └── style0.css
 ```
 
-<h2>1.2.1. Component_slice.ts</h2>
+<h3>1.1.1. State management</h3>
 
-0. Change the slice (e.g. `Component1_slice.ts`)
+Using `Redux` for global state management, local state could define in component with `React.useState`
+
+Following is example of changing Component1_slice
+
+0. Change the slice
     ```ts
     import { createSlice, combineReducers } from '@reduxjs/toolkit';
     import { component2Reducer } from "pages/Component1/Component2"; // Import reducers in same directory (Only for the head in the directory)
 
-    export const component1Slice = createSlice({ // Create slice
-      name: 'Component1', // Name
-      initialState: { // Initial state
-        variable1: value1,
+    export const component1Slice = createSlice({ // Slice copntains reducers and actions
+      name: 'Component1',
+      initialState: {
+        state1: value1,
       } as {
-        variable1: type1,
+        state1: type1,
       },
-      reducers: { // Reducers
-        setVariable1: (state, action) => {
-          state.variable1 = action.payload;
+      reducers: {
+        setState1: (state, action) => {
+          state.state1 = action.payload;
         }
       },
     });
 
-    export default combineReducers({ // Return combined reducers, if not the head of directory, just return a reducer is ok
+    export const { // Return actions
+      setState1,
+    } = component1Slice.actions
+
+    export const component1Reducer = combineReducers({ // Return combined reducers, if not the head of directory, just return a reducer is ok
       component1: component1Slice.reducer,
       component2: combineReducers
     });
@@ -108,8 +117,8 @@ src/
 
     ```ts
     import { configureStore } from '@reduxjs/toolkit';
-    import component0Reducer from "pages/Component0_slice";
-    import component1Reducer from "pages/Component1/Component1_slice"; // Import newly created slice
+    import { component0Reducer } from "pages/Component0_slice";
+    import { component1Reducer } from "pages/Component1/Component1_slice"; // Import newly created slice
 
     export const store = configureStore({ // Add the newly created reducer
       reducer: {
@@ -122,11 +131,11 @@ src/
     export type AppDispatch = typeof store.dispatch
     ```
 
-<h2>1.2.2. Component.tsx</h2>
+<h3>1.1.2. Pages && Components</h3>
 
 ```tsx
-import { useAppSelector, useAppDispatch } from "others/index_hooks"; // Import hooks for redux (global state management)
-import { setState0 } from "others/Component0_slice"; // Import actions
+import { useAppSelector, useAppDispatch } from "others/index_hooks"; // Import hooks for redux, just added typing for useSelector and useDispatch
+import { setState0 } from "others/Component0_slice"; // Import redux actions
 
 const Component1 = ({ // Define parameters and corresponding data type
   variable1,
@@ -170,18 +179,24 @@ const Component1 = ({ // Define parameters and corresponding data type
 export default Component1;
 ```
 
-<h2>1.2.3. Component_type.ts</h2>
+<h3>1.1.3. Bugs</h3>
 
-```ts
-export interface Interface1 {
-  variable1: type1
-}
-```
+<h4>Bug 0</h4>
 
-<h2>1.2.4. Component_enum.ts</h2>
+<h5>Problem</h5>
 
-```ts
-export enum Enum1 {
-  variable1 = "value1"
-}
-```
+When using docker for development, donsole continue output `Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at http://localhost:xxxxx/socket.io/?EIO=4&transport=polling&t=XXXXXX. (Reason: CORS request did not succeed). Status code: (null).`
+
+<h5>Solution</h5>
+
+Add environment variable `INTERNAL_STATUS_PORT`, and map the port
+
+<h4>Bug 1</h4>
+
+<h5>Problem</h5>
+
+Redux not recommended to put non-serializable values in state or actions.
+
+<h5>Solution</h5>
+
+Ignore it by setting `ignoredActions` and `ignoredPaths` in `index_store.ts`

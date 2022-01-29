@@ -6,10 +6,9 @@ services:
       target: "dev"
     ports:
       - "${DEV_HOST_PORT}:8000"
+      - "${INTERNAL_STATUS_PORT}:${INTERNAL_STATUS_PORT}" # Have to be same port
     volumes:
       - ".:/app:rw"
-    command: sh -c "
-      npm install &&
-      npm run start
-      "
-  
+    command: sh -c "npm install && npm run start"
+    environment:
+      - INTERNAL_STATUS_PORT=${INTERNAL_STATUS_PORT}

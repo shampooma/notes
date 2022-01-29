@@ -20,9 +20,8 @@
 
 - Option 0: use docker
 
-  Set `PROCESS_MODE=prod` in `.env`
-
   ```sh
+  sed -i 's/PROCESS_MODE=.*/PROCESS_MODE=prod/' .env
   ./start.sh build
   docker run -itd --rm --name notes_prod_container notes_prod sh
   if [ ! -e ./docs ]; then mkdir ./docs; elif [ -e ./docs/* ]; then rm -r ./docs/*; fi
@@ -46,6 +45,8 @@ git add .
 git commit -m "new commit"
 git push origin dev
 ```
+
+<h3>2.0.2. Create pull request</h3>
 
 <h2>2.1. Hints</h2>
 <h3>2.1.0. Path prefix</h3>
