@@ -2,6 +2,10 @@ FROM node:current-alpine3.15 as base
 
 WORKDIR /app
 
+FROM base as dev
+
+CMD []
+
 FROM base as prod
 
 COPY src src
@@ -15,9 +19,5 @@ COPY gatsby-browser.js \
   ./
 
 RUN npm ci --production && npm run build --prefix-paths
-
-CMD []
-
-FROM base as dev
 
 CMD []
