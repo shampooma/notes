@@ -25,7 +25,6 @@ import { DBStoreNameV2, DBStockStoreItemV2, DBStockRecordV2 } from "indexeddb/ty
 import { IconButton } from "@mui/material";
 
 const EditDialog = () => {
-
   // ____ _    ____ ___  ____ _       ____ ___ ____ ___ ____
   // | __ |    |  | |__] |__| |       [__   |  |__|  |  |___
   // |__] |___ |__| |__] |  | |___    ___]  |  |  |  |  |___
@@ -62,7 +61,7 @@ const EditDialog = () => {
   // |  | [__  |___    |___ |___ |___ |___ |     |
   // |__| ___] |___    |___ |    |    |___ |___  |
   React.useEffect(() => {
-    if (editDialogIndex  > -1 && showEditDialog) {
+    if (editDialogIndex > -1 && showEditDialog) {
       setDeletePosition("0");
       setAddPrice("0");
       setAddPosition("0");
@@ -91,7 +90,7 @@ const EditDialog = () => {
       });
 
       // Put stockRecord
-      const {price: oldPrice, position: oldPosition} = stockStoreItem.stockRecordArray[editDialogIndex];
+      const { price: oldPrice, position: oldPosition } = stockStoreItem.stockRecordArray[editDialogIndex];
 
       stockStoreItem.stockRecordArray[editDialogIndex]["price"] = (oldPrice * oldPosition + Number(addPrice) * Number(addPosition)) / (oldPosition + Number(addPosition));
       stockStoreItem.stockRecordArray[editDialogIndex]["position"] = (oldPosition + Number(addPosition))
@@ -186,7 +185,7 @@ const EditDialog = () => {
           res(0);
         }
       })
-      
+
       dispatch(deleteLoading(LoadingString.components_StockList_EditDialog_deleteStock))
     } catch (e) {
       console.log(e);
@@ -239,6 +238,7 @@ const EditDialog = () => {
       onClose={closeDialog}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
+
     >
       <Box
         display="flex"
@@ -275,7 +275,11 @@ const EditDialog = () => {
           </IconButton>
         </DialogTitle>
       </Box>
-      <DialogContent>
+      <DialogContent
+        style={{
+          height: "200px"
+        }}
+      >
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Tabs value={editAction} onChange={(e, v) => setEditAction(v)} aria-label="basic tabs example">
             <Tab label="Add" />
@@ -346,8 +350,8 @@ const EditDialog = () => {
         <DialogActions>
           {
             editAction === 0 ?
-            <Button onClick={addStockButtonOnclick}>Add</Button> :
-            <Button onClick={deleteStockButtonOnclick}>Delete</Button>
+              <Button onClick={addStockButtonOnclick}>Add</Button> :
+              <Button onClick={deleteStockButtonOnclick}>Delete</Button>
           }
         </DialogActions>
       </Box>

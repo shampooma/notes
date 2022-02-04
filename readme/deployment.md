@@ -23,16 +23,17 @@
   ```sh
   sed -i 's/PROCESS_MODE=.*/PROCESS_MODE=prod/' .env
   ./start.sh build
-  if [ ! -e ./docs ]; then mkdir ./docs; elif [ -e ./docs/* ]; then rm -r ./docs/*; fi
-  docker cp notes_prod_container:/app/public/. ./docs/
-  docker kill notes_prod_container
+  if [ ! -e ./docs ]; then mkdir ./docs; else rm -r ./docs/*; fi
+  ./start.sh up -d
+  docker cp notes_prod_1:/app/public/. ./docs/
+  ./start.sh down
   ```
 
 - Option 1: use npm directly
 
   ```sh
   npm run build --prefix-paths
-  if [ ! -e ./docs ]; then mkdir ./docs; elif [ -e ./docs/* ]; then rm -r ./docs/*; fi
+  if [ ! -e ./docs ]; then mkdir ./docs; else rm -r ./docs/*; fi
   cp -r ./public/* ./docs/
   ```
 

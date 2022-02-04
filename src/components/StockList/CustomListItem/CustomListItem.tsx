@@ -8,7 +8,7 @@ import ListItemText from '@mui/material/ListItemText';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import ListItemButton from '@mui/material/ListItemButton';
 
-import { pushLoading } from "components/Loading/Loading_slice";
+import { deleteLoading, pushLoading } from "components/Loading/Loading_slice";
 import { useIndexSelector, useIndexDispatch } from "components/index/index_hooks";
 import {
   setEditDialogIndex,
@@ -16,6 +16,7 @@ import {
 } from "components/StockList/EditDialog/EditDialog_slice";
 import { LoadingString } from "components/Loading/Loading_type";
 import { DBStockStoreItemV2, DBStoreNameV2 } from "indexeddb/type";
+import { setStockList } from "../StockList_slice";
 
 const CustomListItem = ({
   index,
@@ -48,7 +49,7 @@ const CustomListItem = ({
   // ____ _  _ _  _ ____ ___ _ ____ _  _ ____
   // |___ |  | |\ | |     |  | |  | |\ | [__
   // |    |__| | \| |___  |  | |__| | \| ___]
-  const customListItemDeleteButtonOnclick = async() => {
+  const customListItemDeleteButtonOnclick = async () => {
     try {
       dispatch(pushLoading(LoadingString.components_StockList_CustomListItem_deleteItem));
 
@@ -92,15 +93,16 @@ const CustomListItem = ({
         }
 
         request.onsuccess = () => {
+          dispatch(setStockList(request.result.stockRecordArray))
           res(0);
         }
       });
 
       // End
-      dispatch(pushLoading(LoadingString.components_StockList_CustomListItem_deleteItem));
+      dispatch(deleteLoading(LoadingString.components_StockList_CustomListItem_deleteItem));
     } catch (e) {
       console.log(e);
-      dispatch(pushLoading(LoadingString.components_StockList_CustomListItem_deleteItem));
+      dispatch(deleteLoading(LoadingString.components_StockList_CustomListItem_deleteItem));
     }
   }
 
@@ -110,32 +112,34 @@ const CustomListItem = ({
   }
 
 
-  return (<ListItem
-    secondaryAction={
-      <IconButton
-        edge="end"
-        aria-label="delete"
-        onClick={customListItemDeleteButtonOnclick}
-      >
-        <DeleteIcon />
-      </IconButton>
-    }
-    disablePadding
-  >
-    <ListItemButton
-      onClick={customListItemButtonOnclick}
+  return (<>
+    <ListItem
+      secondaryAction={
+        <IconButton
+          edge="end"
+          aria-label="delete"
+          onClick={customListItemDeleteButtonOnclick}
+        >
+          <DeleteIcon />
+        </IconButton>
+      }
+      disablePadding
     >
-      <ListItemAvatar>
-        <Avatar>
-          <FolderIcon />
-        </Avatar>
-      </ListItemAvatar>
-      <ListItemText
-        primary={stockRecordArray[index]['name']}
-        secondary={`Price: ${stockRecordArray[index]['price']} | Position: ${stockRecordArray[index]['position']}`}
-      />
-    </ListItemButton>
-  </ListItem>);
+      <ListItemButton
+        onClick={customListItemButtonOnclick}
+      >
+        <ListItemAvatar>
+          <Avatar>
+            <FolderIcon />
+          </Avatar>
+        </ListItemAvatar>
+        <ListItemText
+          primary={stockRecordArray[index]['name']}
+          secondary={`Price: ${stockRecordArray[index]['price']} | Position: ${stockRecordArray[index]['position']}`}
+        />
+      </ListItemButton>
+    </ListItem>
+  </>);
 }
 
-export default CustomListItem
+export default CustomListItem;

@@ -5,10 +5,11 @@ import { DBChangeVersion } from "indexeddb/changeVersion";
 import { DBName, DBCurrentVersion } from "indexeddb/config";
 import { DBStoreNameV2 } from "indexeddb/type";
 import { useIndexSelector, useIndexDispatch } from "components/index/index_hooks";
-import { setDb, } from "components/index/index_slice";
+import { setDb, setDocumentIndex, } from "components/index/index_slice";
 import * as React from "react";
 import { LoadingString } from "components/Loading/Loading_type";
 import { pushLoading, deleteLoading } from "components/Loading/Loading_slice";
+import Box from '@mui/material/Box';
 
 const IndexPage = () => {
   console.log("index.tsx");
@@ -16,10 +17,11 @@ const IndexPage = () => {
   // | __ |    |  | |__] |__| |       [__   |  |__|  |  |___
   // |__] |___ |__| |__] |  | |___    ___]  |  |  |  |  |___
   const dispatch = useIndexDispatch();
-  const { db, documentIndex } = useIndexSelector((state) => {
+  const { db, documentIndex, documentArray } = useIndexSelector((state) => {
     return {
       db: state.index.db,
       documentIndex: state.index.documentIndex,
+      documentArray: state.Drawer.documentArray
     }
   })
 
@@ -34,9 +36,9 @@ const IndexPage = () => {
     (async () => {
       await new Promise((res, rej) => {
         const loadingString = LoadingString.page_index_openDB;
-        
+
         dispatch(pushLoading(loadingString))
-        
+
 
         const request = self.indexedDB.open(DBName, DBCurrentVersion);
 
@@ -53,7 +55,7 @@ const IndexPage = () => {
 
         // Success for connecting to db
         request.onsuccess = () => {
-          
+
           dispatch(setDb(request.result));
 
           dispatch(deleteLoading(loadingString));
@@ -62,6 +64,12 @@ const IndexPage = () => {
       })
     })()
   }, []);
+
+  React.useEffect(() => {
+    if (documentArray.length > 0 && documentIndex === -1) {
+      dispatch(setDocumentIndex(0));
+    }
+  }, [documentArray]);
 
   React.useEffect(() => {
     (async () => {
@@ -96,12 +104,17 @@ const IndexPage = () => {
   return (<>
     <Loading></Loading>
     {
-      db !== null && 
+      db !== null &&
       <>
         <Drawer></Drawer>
         {
           documentIndex === -1 ?
-            <h1>Please create new document</h1> :
+            <Box
+              display="flex"
+              justifyContent="center"
+            >
+              <h1>Please create new document</h1>
+            </Box> :
             <>
               <StockList></StockList>
             </>

@@ -1,4 +1,4 @@
-import { DBDocumentV2 } from "indexeddb/type";
+import { DBDocumentStoreItemV2 } from "indexeddb/type";
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export const DrawerSlice = createSlice({
@@ -6,10 +6,10 @@ export const DrawerSlice = createSlice({
   initialState: {
     documentArray: [],
   } as {
-    documentArray: DBDocumentV2[],
+    documentArray: DBDocumentStoreItemV2[],
   },
   reducers: {
-    setDrawerList: (state, action: PayloadAction<DBDocumentV2[]>) => {
+    setDrawerList: (state, action: PayloadAction<DBDocumentStoreItemV2[]>) => {
       state.documentArray = action.payload;
     },
   },
