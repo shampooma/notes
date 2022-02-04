@@ -10,6 +10,12 @@ export interface DBStockRecordV2 {
   position: number,
 }
 
+export interface DBPutStockRecordV2 {
+  name?: string,
+  price?: number,
+  position?: number,
+}
+
 export interface DBStockStoreItemV2 {
   id: string,
   stockRecordArray: DBStockRecordV2[]

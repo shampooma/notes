@@ -1,0 +1,26 @@
+.editName {
+  /* width: 50px; */
+  text-align: center;
+}
+
+.editName-enter {
+  text-align: center;
+  /* width: 50px; */
+}
+
+.editName-enter-active {
+  text-align: left;
+  transition: textAlign 1000ms, width 1000ms;
+  /* width: 500px; */
+}
+
+.editName-exit {
+  text-align: left;
+  /* width: 500px; */
+}
+
+.editName-exit-active {
+  text-align: center;
+  transition: text-align 1000ms, width 1000ms;
+  /* width: 50px; */
+}

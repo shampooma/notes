@@ -8,16 +8,14 @@ import ListItemText from '@mui/material/ListItemText';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import ListItemButton from '@mui/material/ListItemButton';
 
-import { setStockList } from "components/StockList/StockList_slice";
-import { pushLoading, deleteLoading } from "components/Loading/Loading_slice";
+import { pushLoading } from "components/Loading/Loading_slice";
 import { useIndexSelector, useIndexDispatch } from "components/index/index_hooks";
 import {
-  setEditDialogContent,
   setEditDialogIndex,
   setShowEditDialog,
 } from "components/StockList/EditDialog/EditDialog_slice";
 import { LoadingString } from "components/Loading/Loading_type";
-import { DBStockStoreItemV2, DBStockRecordV2, DBStoreNameV2 } from "indexeddb/type";
+import { DBStockStoreItemV2, DBStoreNameV2 } from "indexeddb/type";
 
 const CustomListItem = ({
   index,
@@ -107,11 +105,6 @@ const CustomListItem = ({
   }
 
   const customListItemButtonOnclick = () => {
-    dispatch(setEditDialogContent({
-      name: stockRecordArray[index].name,
-      price: stockRecordArray[index].price,
-      position: stockRecordArray[index].position
-    }));
     dispatch(setEditDialogIndex(index));
     dispatch(setShowEditDialog(true));
   }

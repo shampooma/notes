@@ -7,4 +7,5 @@ export enum LoadingString {
   components_StockList_StockList_getStockRecords,
   components_StockList_StockList_add,
   components_StockList_EditDialog_update,
+  components_StockList_EditDialog_deleteStock,
 }
