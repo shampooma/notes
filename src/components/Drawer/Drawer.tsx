@@ -2,7 +2,6 @@ import AddIcon from '@mui/icons-material/Add';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import * as React from 'react';
@@ -167,8 +166,8 @@ export default function SwipeableTemporaryDrawer() {
           >
             <Box
               style={{
-                width: "200px",
-                height: "100vh"
+                // width: "100px",
+                height: "100%",
               }}
               sx={{
                 display: 'flex',
@@ -177,42 +176,56 @@ export default function SwipeableTemporaryDrawer() {
                 justifyContent: 'space-between'
               }}
             >
-              <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-                {
-                  list.map((item, i) => {
-                    return (
-                      <ListItemButton
-                        alignItems="flex-start"
-                        key={i}
-                        onClick={() => dispatch(setDocumentIndex(i))}
-                      >
-                        <ListItemAvatar>
-                        </ListItemAvatar>
-                        <ListItemText
-                          primary={item.name}
-                          secondary={item.type}
-                        />
-                      </ListItemButton>
-                    )
-                  })
-                }
-                <ListItem key={-1}>
-                  <Box
-                    style={{
-                      width: "100%"
-                    }}
-                    sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <IconButton onClick={drawerAddDocumentButton}>
-                      <AddIcon></AddIcon>
-                    </IconButton>
-                  </Box>
-                </ListItem>
-              </List>
-              <Box>
+              <Box
+                style={{
+                  height: "90%",
+                  width: "300px",
+                  overflowY: "scroll",
+                  overflowX: "hidden",
+                }}
+              >
+
+                <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
+                  {
+                    list.map((item, i) => {
+                      return (
+                        <ListItemButton
+                          alignItems="flex-start"
+                          key={i}
+                          onClick={() => dispatch(setDocumentIndex(i))}
+                        >
+                          <ListItemAvatar>
+                          </ListItemAvatar>
+                          <ListItemText
+                            primary={item.name}
+                            secondary={item.type}
+                          />
+                        </ListItemButton>
+                      )
+                    })
+                  }
+                  <ListItem key={-1}>
+                    <Box
+                      style={{
+                        width: "100%"
+                      }}
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <IconButton onClick={drawerAddDocumentButton}>
+                        <AddIcon></AddIcon>
+                      </IconButton>
+                    </Box>
+                  </ListItem>
+                </List>
+              </Box>
+              <Box
+                style={{
+                  height: "50px"
+                }}
+              >
                 <IconButton href="https://github.com/shampooma/notes" target="_blank">
                   <GitHubIcon></GitHubIcon>
                 </IconButton>

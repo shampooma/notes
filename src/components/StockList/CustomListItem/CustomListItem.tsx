@@ -49,7 +49,7 @@ const CustomListItem = ({
   // ____ _  _ _  _ ____ ___ _ ____ _  _ ____
   // |___ |  | |\ | |     |  | |  | |\ | [__
   // |    |__| | \| |___  |  | |__| | \| ___]
-  const customListItemDeleteButtonOnclick = async() => {
+  const customListItemDeleteButtonOnclick = async () => {
     try {
       dispatch(pushLoading(LoadingString.components_StockList_CustomListItem_deleteItem));
 
@@ -112,32 +112,34 @@ const CustomListItem = ({
   }
 
 
-  return (<ListItem
-    secondaryAction={
-      <IconButton
-        edge="end"
-        aria-label="delete"
-        onClick={customListItemDeleteButtonOnclick}
-      >
-        <DeleteIcon />
-      </IconButton>
-    }
-    disablePadding
-  >
-    <ListItemButton
-      onClick={customListItemButtonOnclick}
+  return (<>
+    <ListItem
+      secondaryAction={
+        <IconButton
+          edge="end"
+          aria-label="delete"
+          onClick={customListItemDeleteButtonOnclick}
+        >
+          <DeleteIcon />
+        </IconButton>
+      }
+      disablePadding
     >
-      <ListItemAvatar>
-        <Avatar>
-          <FolderIcon />
-        </Avatar>
-      </ListItemAvatar>
-      <ListItemText
-        primary={stockRecordArray[index]['name']}
-        secondary={`Price: ${stockRecordArray[index]['price']} | Position: ${stockRecordArray[index]['position']}`}
-      />
-    </ListItemButton>
-  </ListItem>);
+      <ListItemButton
+        onClick={customListItemButtonOnclick}
+      >
+        <ListItemAvatar>
+          <Avatar>
+            <FolderIcon />
+          </Avatar>
+        </ListItemAvatar>
+        <ListItemText
+          primary={stockRecordArray[index]['name']}
+          secondary={`Price: ${stockRecordArray[index]['price']} | Position: ${stockRecordArray[index]['position']}`}
+        />
+      </ListItemButton>
+    </ListItem>
+  </>);
 }
 
-export default CustomListItem
+export default CustomListItem;
