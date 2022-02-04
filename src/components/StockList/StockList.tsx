@@ -4,76 +4,128 @@ import Box from '@mui/material/Box';
 import List from "@mui/material/List";
 import IconButton from '@mui/material/IconButton';
 
-import * as indexEnum from "others/App_enum";
-import * as StockListType from "others/StockList/StockList_type";
-import EditDialog from "./EditDialog";
-import { setItems } from "others/StockList/StockList_slice"
-import CustomListItem from './CustomListItem';
-import { setLoading } from "others/App_slice";
-import { useAppSelector, useAppDispatch } from "others/index_hooks"
+import { LoadingString } from "components/Loading/Loading_type";
+import EditDialog from "./EditDialog/EditDialog";
+import { setStockList } from "components/StockList/StockList_slice"
+import CustomListItem from './CustomListItem/CustomListItem';
+import { pushLoading, deleteLoading } from "components/Loading/Loading_slice";
+import { DBStockStoreItemV2, DBStockRecordV2, DBStoreNameV2 } from "indexeddb/type";
+import { useIndexSelector, useIndexDispatch } from "components/index/index_hooks"
 
 const StockList = () => {
   // ____ _    ____ ___  ____ _       ____ ___ ____ ___ ____
   // | __ |    |  | |__] |__| |       [__   |  |__|  |  |___
   // |__] |___ |__| |__] |  | |___    ___]  |  |  |  |  |___
-  const dispatch = useAppDispatch()
-  const {db, items} = useAppSelector((state) => {
+  const dispatch = useIndexDispatch()
+  const { db, stockRecordArray, documentIndex, documentArray } = useIndexSelector((state) => {
     return {
-      db: state.app.db as IDBDatabase, //Checked in index.tsx
-      items: state.stockList.stockList.items
+      db: state.index.db as IDBDatabase, //Checked in index.tsx
+      stockRecordArray: state.stockList.stockList.stockRecordArray,
+      documentIndex: state.index.documentIndex,
+      documentArray: state.Drawer.documentArray,
     }
   });
 
-  // Local state
+  // _    ____ ____ ____ _       ____ ___ ____ ___ ____
+  // |    |  | |    |__| |       [__   |  |__|  |  |___
+  // |___ |__| |___ |  | |___    ___]  |  |  |  |  |___
 
-  // useEffect
+  // _  _ ____ ____    ____ ____ ____ ____ ____ ___
+  // |  | [__  |___    |___ |___ |___ |___ |     |
+  // |__| ___] |___    |___ |    |    |___ |___  |
   React.useEffect(() => {
-    dispatch(setLoading(true))
+    (async () => {
+      try {
+        // Get stockRecordArray
+        dispatch(pushLoading(LoadingString.components_StockList_StockList_getStockRecords))
 
-    const getAllRequest = db.transaction(indexEnum.DBStoreName.stockStore, 'readwrite').objectStore(indexEnum.DBStoreName.stockStore).getAll();
+        await new Promise((res, rej) => {
+          const request = db.transaction(DBStoreNameV2.stockRecordStore, 'readonly').objectStore(DBStoreNameV2.stockRecordStore).get(documentArray[documentIndex].recordId);
 
-    getAllRequest.onsuccess = () => {
-      dispatch(setItems(getAllRequest.result))
+          request.onerror = (e) => {
+            rej(e);
+          }
 
-      dispatch(setLoading(false));
-    }
+          request.onsuccess = () => {
+            console.log(request.result);
+            dispatch(setStockList(request.result.stockRecordArray));
 
-    getAllRequest.onerror = (e) => {
-      console.log(e)
-      dispatch(setLoading(false));
-    }
-  }, [db]);
+            res(0);
+          }
+        })
 
-  // Functions
-  const centerAddButtonOnclick = React.useCallback(() => {
-    dispatch(setLoading(true));
-
-    const newItem: StockListType.AddItem = {
-      name: "newItem",
-      price: 0,
-      position: 0
-    }
-
-    const addItemRequest = db.transaction(indexEnum.DBStoreName.stockStore, 'readwrite').objectStore(indexEnum.DBStoreName.stockStore).add(newItem);
-
-    addItemRequest.onsuccess = () => {
-      const getAllRequest = db.transaction(indexEnum.DBStoreName.stockStore, 'readwrite').objectStore(indexEnum.DBStoreName.stockStore).getAll();
-
-      getAllRequest.onsuccess = () => {
-        dispatch(setItems(getAllRequest.result));
-
-        dispatch(setLoading(false));
-      }
-
-      getAllRequest.onerror = (e) => {
+        dispatch(deleteLoading(LoadingString.components_StockList_StockList_getStockRecords));
+      } catch (e) {
         console.log(e);
-        dispatch(setLoading(false));
+        dispatch(deleteLoading(LoadingString.components_StockList_StockList_getStockRecords));
       }
-    }
+    })()
+  }, [db, documentIndex]);
 
-    addItemRequest.onerror = (e) => {
+  // ____ _  _ _  _ ____ ___ _ ____ _  _ ____
+  // |___ |  | |\ | |     |  | |  | |\ | [__
+  // |    |__| | \| |___  |  | |__| | \| ___]
+  const centerAddButtonOnclick = React.useCallback(async () => {
+    try {
+      dispatch(pushLoading(LoadingString.components_StockList_StockList_add));
+
+      // Read stockStoreItem
+      const stockStoreItem = await new Promise<DBStockStoreItemV2>((res, rej) => {
+        const request = db.transaction(DBStoreNameV2.stockRecordStore, 'readonly').objectStore(DBStoreNameV2.stockRecordStore).get(documentArray[documentIndex].recordId);
+
+        request.onerror = (e) => {
+          console.log(e);
+          rej(e);
+        }
+
+        request.onsuccess = () => {
+          res(request.result);
+        }
+      });
+
+      // Push stockRecordArray of stockStoreItem
+      const newStockItem = {
+        name: "newStock",
+        position: 0,
+        price: 0,
+      }
+
+      stockStoreItem.stockRecordArray.push(newStockItem);
+
+      await new Promise((res, rej) => {
+        const request = db.transaction(DBStoreNameV2.stockRecordStore, 'readwrite').objectStore(DBStoreNameV2.stockRecordStore).put(stockStoreItem);
+
+        request.onerror = (e) => {
+          console.log(e);
+          rej(e);
+        }
+
+        request.onsuccess = () => {
+          res(0);
+        }
+      });
+
+      // Read stockStoreItem
+      await new Promise((res, rej) => {
+        const request = db.transaction(DBStoreNameV2.stockRecordStore, 'readonly').objectStore(DBStoreNameV2.stockRecordStore).get(documentArray[documentIndex].recordId);
+
+        request.onerror = (e) => {
+          console.log(e);
+          rej(e);
+        }
+
+        request.onsuccess = () => {
+          dispatch(setStockList(request.result.stockRecordArray));
+
+          res(0);
+        }
+      });
+
+      // End
+      dispatch(deleteLoading(LoadingString.components_StockList_StockList_add))
+    } catch (e) {
       console.log(e);
-      dispatch(setLoading(false));
+      dispatch(deleteLoading(LoadingString.components_StockList_StockList_add))
     }
   }, [db]);
 
@@ -83,7 +135,7 @@ const StockList = () => {
       <EditDialog></EditDialog>
 
       <List>
-        {items.map((item, i) => {
+        {stockRecordArray.map((stockRecord, i) => {
 
           return (<CustomListItem
             key={i}

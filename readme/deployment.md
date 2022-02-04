@@ -23,7 +23,6 @@
   ```sh
   sed -i 's/PROCESS_MODE=.*/PROCESS_MODE=prod/' .env
   ./start.sh build
-  docker run -itd --rm --name notes_prod_container notes_prod sh
   if [ ! -e ./docs ]; then mkdir ./docs; elif [ -e ./docs/* ]; then rm -r ./docs/*; fi
   docker cp notes_prod_container:/app/public/. ./docs/
   docker kill notes_prod_container

@@ -18,7 +18,21 @@
 >
 > (NOTE) PWA only works for production mode
 
-<h2>1.0. Procedures</h2>
+[1.0. Procedures](#1.0.)
+
+[1.1. File structure](#1.1.)
+
+[1.2. State management](#1.2.)
+
+[1.3. Pages && Components](#1.3.)
+
+[1.4. IndexedDB](#1.4.)
+
+[1.5. Convensions](1.5.)
+
+[1.6. Bugs](#1.6.)
+
+<h2 id="1.0.">1.0. Procedures</h2>
 
 <h3>1.0.0. Clone git repository</h3>
 
@@ -44,9 +58,7 @@ cd notes
   npm run start
   ```
 
-<h2>1.1. Hints</h2>
-
-<h3>1.1.0. File structure</h3>
+<h2 id="1.1.">1.1. File structure</h2>
 
 ```bash
 src/
@@ -78,26 +90,30 @@ src/
     └── style0.css
 ```
 
-<h3>1.1.1. State management</h3>
+<h2 id="1.2.">1.2. State management</h2>
 
-Using `Redux` for global state management, local state could define in component with `React.useState`
+<h3>1.2.0. Tech</h3>
 
-Following is example of changing Component1_slice
+0. Redux
+
+<h3>1.2.1. Global state</h3>
+
+How to use refer to *_slice.ts
 
 0. Change the slice
     ```ts
-    import { createSlice, combineReducers } from '@reduxjs/toolkit';
+    import { createSlice, combineReducers, PayloadAction } from '@reduxjs/toolkit';
     import { component2Reducer } from "pages/Component1/Component2"; // Import reducers in same directory (Only for the head in the directory)
 
     export const component1Slice = createSlice({ // Slice copntains reducers and actions
       name: 'Component1',
       initialState: {
-        state1: value1,
+        state1: value1, // State how to use
       } as {
         state1: type1,
       },
       reducers: {
-        setState1: (state, action) => {
+        setState1: (state, action: PayloadAction<type1>) => {
           state.state1 = action.payload;
         }
       },
@@ -131,9 +147,10 @@ Following is example of changing Component1_slice
     export type AppDispatch = typeof store.dispatch
     ```
 
-<h3>1.1.2. Pages && Components</h3>
+<h2 id="1.3.">1.3. Pages && Components</h2>
 
 ```tsx
+import * as React from "react"
 import { useAppSelector, useAppDispatch } from "others/index_hooks"; // Import hooks for redux, just added typing for useSelector and useDispatch
 import { setState0 } from "others/Component0_slice"; // Import redux actions
 
@@ -179,24 +196,92 @@ const Component1 = ({ // Define parameters and corresponding data type
 export default Component1;
 ```
 
-<h3>1.1.3. Bugs</h3>
+<h2 id="1.4.">1.4. IndexedDB</h2>
 
-<h4>Bug 0</h4>
+<h3>1.4.0 Config</h4>
 
-<h5>Problem</h5>
+DB configs are stored in `src/indexeddb/config.ts`
+
+<h3>1.4.1 Upgrade</h3>
+
+0. Change `DBCurrentVersion`, `DBMaxVersion` in `indexeddb/config.ts`
+
+1. Add a folder `vx` to `indexeddb/versions`
+    ```sh
+    vx/  // For React component that not rendered as pages
+    ├── type.ts
+    ├── api.ts
+    └── changeVersion.ts
+    ```
+    
+2. Add `types` and `enum` to `indexeddb/versions/vx/type.ts`
+    ```ts
+    import { DBoldRecordV0 } from "indexeddb/version/v0";
+
+    export interface DBNewRecordV1 extends DBoldRecordV0 {};
+
+    export interface newRecordV1 { id: string }
+    ```
+  
+3. Add `upgrade` to `indexeddb/versions/vx/changeVersion.ts`
+
+    ```ts
+    import { newRecordV1 } from 'indexeddb/versions/vx/type.ts'
+    export const upgradeVx = (e: IDBVersionChangeEvent, request: IDBOpenDBRequest) => {}
+    ```
+
+4. Add APIs to `indexeddb/versions/vx/api.ts`, should return Promise
+
+    ```ts
+    const readStore = (db: IDBDatabase, itemId: number): Promise<number> => {
+      return new Promise((res, rej) => {
+        res(0);
+      })
+    }
+    ```
+
+5. (Add new type to || delete useless type from) `indexeddb/type.ts`
+
+6. Add `upgradeVx` to `indexeddb/changeVersion.ts`, it will be executed by `pages/index.tsx`
+
+<h2 id="1.5.">1.5. Convensions</h2>
+
+<h3>1.5.0. Naming</h3>
+
+If the variable not only used in certain area, it should contain prefix that indicate what this variable used for, such as `DBUpgrade`
+
+<h3>1.5.1. Error handling</h3>
+
+Error should handled within same file 
+
+```ts
+const fun = () => {
+  try {
+
+  } catch (e) {
+    console.log(e);
+  }
+}
+```
+
+<h2 id="1.6.">1.6. Bugs</h2>
+
+<h3>Bug 0</h3>
+
+<h4>Problem</h4>
 
 When using docker for development, donsole continue output `Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at http://localhost:xxxxx/socket.io/?EIO=4&transport=polling&t=XXXXXX. (Reason: CORS request did not succeed). Status code: (null).`
 
-<h5>Solution</h5>
+<h4>Solution</h4>
 
 Add environment variable `INTERNAL_STATUS_PORT`, and map the port
 
-<h4>Bug 1</h4>
+<h3>Bug 1</h3>
 
-<h5>Problem</h5>
+<h4>Problem</h4>
 
 Redux not recommended to put non-serializable values in state or actions.
 
-<h5>Solution</h5>
+<h4>Solution</h4>
 
 Ignore it by setting `ignoredActions` and `ignoredPaths` in `index_store.ts`

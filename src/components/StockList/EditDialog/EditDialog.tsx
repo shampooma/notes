@@ -7,40 +7,42 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 
-import * as indexEnum from "others/App_enum";
-import * as StockListClass from "others/StockList/StockList_type";
-import { setItems } from "others/StockList/StockList_slice";
-import { setLoading } from "others/App_slice";
-import { useAppSelector, useAppDispatch } from "others/index_hooks";
+import { setStockList } from "components/StockList/StockList_slice";
+import { pushLoading, deleteLoading } from "components/Loading/Loading_slice";
+import { useIndexSelector, useIndexDispatch } from "components/index/index_hooks";
 import {
   setName,
   setPrice,
   setPosition,
   setShowEditDialog
-} from "others/StockList/EditDialog_slice";
+} from "components/StockList/EditDialog/EditDialog_slice";
+import { LoadingString } from "components/Loading/Loading_type";
+import { DBStoreNameV2, DBStockStoreItemV2 } from "indexeddb/type";
 
 const EditDialog = () => {
   // ____ _    ____ ___  ____ _       ____ ___ ____ ___ ____
   // | __ |    |  | |__] |__| |       [__   |  |__|  |  |___
   // |__] |___ |__| |__] |  | |___    ___]  |  |  |  |  |___
-  const dispatch = useAppDispatch()
+  const dispatch = useIndexDispatch()
   const {
     db,
-    items,
     showEditDialog,
     editDialogName,
     editDialogPrice,
     editDialogPosition,
     editDialogIndex,
-  } = useAppSelector((state) => {
+    documentIndex,
+    documentArray,
+  } = useIndexSelector((state) => {
     return {
-      db: state.app.db as IDBDatabase, //Checked in index.tsx
-      items: state.stockList.stockList.items,
+      db: state.index.db as IDBDatabase, //Checked in index.tsx
       showEditDialog: state.stockList.editDialog.showDialog,
       editDialogName: state.stockList.editDialog.name,
       editDialogPrice: state.stockList.editDialog.price,
       editDialogPosition: state.stockList.editDialog.position,
       editDialogIndex: state.stockList.editDialog.index,
+      documentIndex: state.index.documentIndex,
+      documentArray: state.Drawer.documentArray,
     }
   })
 
@@ -55,48 +57,70 @@ const EditDialog = () => {
   // ____ _  _ _  _ ____ ___ _ ____ _  _ ____
   // |___ |  | |\ | |     |  | |  | |\ | [__
   // |    |__| | \| |___  |  | |__| | \| ___]
-  const updateButtonOnclick = React.useCallback(() => {
-    dispatch(setLoading(true));
+  const updateButtonOnclick = React.useCallback(async() => {
+    try {
+      dispatch(pushLoading(LoadingString.components_StockList_EditDialog_update));
 
-    const updateItem: StockListClass.UpdateItem = {
-      name: editDialogName,
-      price: Number(editDialogPrice),
-      position: Number(editDialogPosition),
-      id: items[editDialogIndex]['id']
-    }
+      // Read stockStoreItem
+      const stockStoreItem = await new Promise<DBStockStoreItemV2>((res, rej) => {
+        const request = db.transaction(DBStoreNameV2.stockRecordStore, 'readwrite').objectStore(DBStoreNameV2.stockRecordStore).get(documentArray[documentIndex].recordId);
 
-    // putRequest start
-    const putRequest = db.transaction(indexEnum.DBStoreName.stockStore, 'readwrite').objectStore(indexEnum.DBStoreName.stockStore).put(updateItem);
+        request.onerror = (e) => {
+          rej(e);
+        }
 
-    // putRequest error
-    putRequest.onerror = (e) => {
+        request.onsuccess = () => {
+          res(request.result);
+        }
+      });
+
+      // Put stockRecord
+      stockStoreItem.stockRecordArray[editDialogIndex] = {
+        name: editDialogName,
+        price: Number(editDialogPrice),
+        position: Number(editDialogPosition),
+      }
+
+      await new Promise((res, rej) => {
+        const request = db.transaction(DBStoreNameV2.stockRecordStore, 'readwrite').objectStore(DBStoreNameV2.stockRecordStore).put(stockStoreItem);
+
+        request.onerror = (e) => {
+          rej(e);
+        }
+
+        request.onsuccess = () => {
+          res(0);
+        }
+      })
+
+      // Read stockArray
+      await new Promise((res, rej) => {
+        const request = db.transaction(DBStoreNameV2.stockRecordStore, 'readonly').objectStore(DBStoreNameV2.stockRecordStore).get(documentArray[documentIndex].recordId);
+
+        request.onerror = (e) => {
+          rej(e);
+        }
+
+        request.onsuccess = () => {
+          dispatch(setStockList(request.result.stockRecordArray));
+
+          res(0);
+        }
+      });
+
+      dispatch(deleteLoading(LoadingString.components_StockList_EditDialog_update));
+    } catch (e) {
       console.log(e);
-      dispatch(setLoading(true));
-    }
-
-    putRequest.onsuccess = () => {
-      // getAllRequest start
-      const getAllRequest = db.transaction(indexEnum.DBStoreName.stockStore, 'readwrite').objectStore(indexEnum.DBStoreName.stockStore).getAll();
-
-      // getAllRequest error
-      getAllRequest.onerror = (e) => {
-        console.log(e);
-        dispatch(setLoading(false));
-      }
-
-      // getAllRequest success
-      getAllRequest.onsuccess = () => {
-        dispatch(setItems(getAllRequest.result));
-        dispatch(setShowEditDialog(false));
-        dispatch(setLoading(false));
-      }
+      dispatch(deleteLoading(LoadingString.components_StockList_EditDialog_update));
     }
   }, [
     db,
     editDialogName,
     editDialogPrice,
     editDialogPosition,
-    editDialogIndex
+    editDialogIndex,
+    documentIndex,
+    documentArray,
   ]);
 
   const closeDialog = React.useCallback(() => {
