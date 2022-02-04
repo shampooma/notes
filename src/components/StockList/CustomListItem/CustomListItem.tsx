@@ -8,7 +8,7 @@ import ListItemText from '@mui/material/ListItemText';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import ListItemButton from '@mui/material/ListItemButton';
 
-import { pushLoading } from "components/Loading/Loading_slice";
+import { deleteLoading, pushLoading } from "components/Loading/Loading_slice";
 import { useIndexSelector, useIndexDispatch } from "components/index/index_hooks";
 import {
   setEditDialogIndex,
@@ -16,6 +16,7 @@ import {
 } from "components/StockList/EditDialog/EditDialog_slice";
 import { LoadingString } from "components/Loading/Loading_type";
 import { DBStockStoreItemV2, DBStoreNameV2 } from "indexeddb/type";
+import { setStockList } from "../StockList_slice";
 
 const CustomListItem = ({
   index,
@@ -92,15 +93,16 @@ const CustomListItem = ({
         }
 
         request.onsuccess = () => {
+          dispatch(setStockList(request.result.stockRecordArray))
           res(0);
         }
       });
 
       // End
-      dispatch(pushLoading(LoadingString.components_StockList_CustomListItem_deleteItem));
+      dispatch(deleteLoading(LoadingString.components_StockList_CustomListItem_deleteItem));
     } catch (e) {
       console.log(e);
-      dispatch(pushLoading(LoadingString.components_StockList_CustomListItem_deleteItem));
+      dispatch(deleteLoading(LoadingString.components_StockList_CustomListItem_deleteItem));
     }
   }
 
