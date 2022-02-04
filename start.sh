@@ -9,4 +9,4 @@ if ["$PROCESS_MODE" != "prod"]; then
 fi
 
 # Run docker-compose
-docker-compose -f docker-compose-$PROCESS_MODE.yml "$@"
+docker-compose -f docker-compose-$PROCESS_MODE.yml $@
