@@ -180,12 +180,21 @@ const Component1 = ({ // Define parameters and corresponding data type
   // _  _ ____ ____    ____ ____ ____ ____ ____ ___
   // |  | [__  |___    |___ |___ |___ |___ |     |
   // |__| ___] |___    |___ |    |    |___ |___  |
-  React.useEffect(() => {}, []);
+  React.useEffect(() => {
+    (async () => {
+      await new Promise((res, rej) => {})
+    })();
+  }, []);
 
   // ____ _  _ _  _ ____ ___ _ ____ _  _ ____
   // |___ |  | |\ | |     |  | |  | |\ | [__
   // |    |__| | \| |___  |  | |__| | \| ___]
-  const function0 = React.useCallback(() => {}, []); // use Callback to reduce computation when re-render
+  const function0 = React.useCallback(async () => {
+    try {
+    } catch (e) {
+    } finally {
+    }
+  }, []); // use Callback to reduce computation when re-render
 
   // ____ ____ ___ _  _ ____ _  _
   // |__/ |___  |  |  | |__/ |\ |

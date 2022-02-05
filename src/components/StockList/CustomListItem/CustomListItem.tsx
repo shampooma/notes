@@ -7,6 +7,12 @@ import FolderIcon from '@mui/icons-material/Folder';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import ListItemButton from '@mui/material/ListItemButton';
+import Dialog from "@mui/material/Dialog";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import Button from "@mui/material/Button";
+import DialogContentText from "@mui/material/DialogContentText";
+import Box from "@mui/material/Box";
 
 import { deleteLoading, pushLoading } from "components/Loading/Loading_slice";
 import { useIndexSelector, useIndexDispatch } from "components/index/index_hooks";
@@ -41,6 +47,8 @@ const CustomListItem = ({
   // _    ____ ____ ____ _       ____ ___ ____ ___ ____
   // |    |  | |    |__| |       [__   |  |__|  |  |___
   // |___ |__| |___ |  | |___    ___]  |  |  |  |  |___
+  const [showDeleteWarning, setShowDeleteWarning] = React.useState(false);
+
 
   // _  _ ____ ____    ____ ____ ____ ____ ____ ___
   // |  | [__  |___    |___ |___ |___ |___ |     |
@@ -49,7 +57,7 @@ const CustomListItem = ({
   // ____ _  _ _  _ ____ ___ _ ____ _  _ ____
   // |___ |  | |\ | |     |  | |  | |\ | [__
   // |    |__| | \| |___  |  | |__| | \| ___]
-  const customListItemDeleteButtonOnclick = async () => {
+  const deleteWarningConfirmOnclick = React.useCallback(async () => {
     try {
       dispatch(pushLoading(LoadingString.components_StockList_CustomListItem_deleteItem));
 
@@ -98,13 +106,17 @@ const CustomListItem = ({
         }
       });
 
-      // End
-      dispatch(deleteLoading(LoadingString.components_StockList_CustomListItem_deleteItem));
     } catch (e) {
       console.log(e);
+    } finally {
+      setShowDeleteWarning(false);
       dispatch(deleteLoading(LoadingString.components_StockList_CustomListItem_deleteItem));
     }
-  }
+  }, [documentArray, documentIndex]);
+
+  const customListItemDeleteButtonOnclick = React.useCallback(() => {
+    setShowDeleteWarning(true);
+  }, []);
 
   const customListItemButtonOnclick = () => {
     dispatch(setEditDialogIndex(index));
@@ -113,6 +125,29 @@ const CustomListItem = ({
 
 
   return (<>
+    <Dialog
+      open={showDeleteWarning}
+      onClose={() => setShowDeleteWarning(false)}
+    >
+      <DialogContent>
+        <DialogContentText id="alert-dialog-description">
+          Confirm to delete stock Item ?
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Box 
+          display="flex"
+          justifyContent="center"
+          style={{
+            width: "100%"
+          }}
+          >
+          <Button onClick={deleteWarningConfirmOnclick} color="error">
+            Confirm
+          </Button>
+        </Box>
+      </DialogActions>
+    </Dialog>
     <ListItem
       secondaryAction={
         <IconButton

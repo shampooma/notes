@@ -16,6 +16,7 @@ import { pushLoading, deleteLoading } from "components/Loading/Loading_slice";
 import { DBStoreNameV2 } from 'indexeddb/type';
 import { setDocumentIndex } from "components/index/index_slice";
 import { LoadingString } from 'components/Loading/Loading_type';
+import CachedIcon from '@mui/icons-material/Cached';
 
 export default function SwipeableTemporaryDrawer() {
   // ____ _    ____ ___  ____ _       ____ ___ ____ ___ ____
@@ -178,6 +179,20 @@ export default function SwipeableTemporaryDrawer() {
             >
               <Box
                 style={{
+                  height: "50px"
+                }}
+              >
+                <IconButton href="https://github.com/shampooma/notes" target="_blank">
+                  <GitHubIcon></GitHubIcon>
+                </IconButton>
+                <IconButton
+                  onClick={() => location.reload()}
+                >
+                  <CachedIcon>s</CachedIcon>
+                </IconButton>
+              </Box>
+              <Box
+                style={{
                   height: "90%",
                   width: "300px",
                   overflowY: "scroll",
@@ -221,15 +236,7 @@ export default function SwipeableTemporaryDrawer() {
                   </ListItem>
                 </List>
               </Box>
-              <Box
-                style={{
-                  height: "50px"
-                }}
-              >
-                <IconButton href="https://github.com/shampooma/notes" target="_blank">
-                  <GitHubIcon></GitHubIcon>
-                </IconButton>
-              </Box>
+
             </Box>
           </SwipeableDrawer>
         </React.Fragment>

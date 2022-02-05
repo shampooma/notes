@@ -47,7 +47,6 @@ const StockList = () => {
           }
 
           request.onsuccess = () => {
-            console.log(request.result);
             dispatch(setStockList(request.result.stockRecordArray));
 
             res(0);

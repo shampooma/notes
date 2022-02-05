@@ -27,7 +27,7 @@ const SimpleBackdrop = () => {
   return (
     <div>
       <Backdrop
-        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        sx={{ color: '#fff', zIndex: 111 }}
         open={loading.length > 0}
       >
         <CircularProgress color="inherit" />
