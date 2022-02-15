@@ -20,7 +20,7 @@ const IndexPage = () => {
     return {
       db: state.index.db,
       documentIndex: state.index.documentIndex,
-      documentArray: state.Drawer.documentArray
+      documentArray: state.Drawer.drawer.documentArray
     }
   })
 

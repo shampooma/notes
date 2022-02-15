@@ -23,7 +23,8 @@
   ```sh
   sed -i 's/PROCESS_MODE=.*/PROCESS_MODE=prod/' .env
   ./start.sh build
-  if [ ! -e ./docs ]; then mkdir ./docs; else rm -r ./docs/*; fi
+  if [ -e ./docs ]; then rm -r ./docs; fi
+  mkdir ./docs
   ./start.sh up -d
   docker cp notes_prod_1:/app/public/. ./docs/
   ./start.sh down

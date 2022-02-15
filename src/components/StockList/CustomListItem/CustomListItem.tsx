@@ -38,7 +38,7 @@ const CustomListItem = ({
       db: state.index.db as IDBDatabase, //Checked in index.tsx
       stockRecordArray: state.stockList.stockList.stockRecordArray,
       documentIndex: state.index.documentIndex,
-      documentArray: state.Drawer.documentArray,
+      documentArray: state.Drawer.drawer.documentArray,
     }
   });
 
