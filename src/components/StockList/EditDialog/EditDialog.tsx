@@ -42,7 +42,7 @@ const EditDialog = () => {
       showEditDialog: state.stockList.editDialog.showDialog,
       editDialogIndex: state.stockList.editDialog.index,
       documentIndex: state.index.documentIndex,
-      documentArray: state.Drawer.documentArray,
+      documentArray: state.Drawer.drawer.documentArray,
       stockRecordArray: state.stockList.stockList.stockRecordArray,
     }
   })
@@ -238,7 +238,6 @@ const EditDialog = () => {
       onClose={closeDialog}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
-
     >
       <Box
         display="flex"

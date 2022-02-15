@@ -8,24 +8,27 @@ import * as React from 'react';
 import { useIndexSelector, useIndexDispatch } from "components/index/index_hooks";
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemAvatar from '@mui/material/ListItemAvatar';
-import ListItemButton from '@mui/material/ListItemButton';
 import { setDrawerList } from 'components/Drawer/Drawer_slice';
 import { pushLoading, deleteLoading } from "components/Loading/Loading_slice";
 import { DBStoreNameV2 } from 'indexeddb/type';
-import { setDocumentIndex } from "components/index/index_slice";
 import { LoadingString } from 'components/Loading/Loading_type';
+import CachedIcon from '@mui/icons-material/Cached';
+import EditIcon from '@mui/icons-material/Edit';
+import DoneIcon from '@mui/icons-material/Done';
+import DocumentItem from "components/Drawer/DocumentItem/DocumentItem";
+import { setEditingDocumentArray } from 'components/Drawer/EditDocumentArray/EditDocumentArray_slice';
+import EditDrawerArray from 'components/Drawer/EditDocumentArray/EditDocumentArray';
 
-export default function SwipeableTemporaryDrawer() {
+const SwipeableTemporaryDrawer = () => {
   // ____ _    ____ ___  ____ _       ____ ___ ____ ___ ____
   // | __ |    |  | |__] |__| |       [__   |  |__|  |  |___
   // |__] |___ |__| |__] |  | |___    ___]  |  |  |  |  |___
   const dispatch = useIndexDispatch();
-  const { db, list } = useIndexSelector((state) => {
+  const { db, list, editingDocumentArray } = useIndexSelector((state) => {
     return {
       db: state.index.db as IDBDatabase,
-      list: state.Drawer.documentArray,
+      list: state.Drawer.drawer.documentArray,
+      editingDocumentArray: state.Drawer.editDrawerArray.editingDocumentArray,
     }
   });
 
@@ -142,98 +145,105 @@ export default function SwipeableTemporaryDrawer() {
     }
   }
 
+  const editDrawerOnclick = React.useCallback((editingDocumentArray) => {
+    dispatch(setEditingDocumentArray(!editingDocumentArray));
+  }, []);
+
   return (
     <div>
       {
-        <React.Fragment key={'left'}>
-          <IconButton
-            onClick={toggleDrawer(true)}
-            style={{
-              backgroundColor: '#ddffdd',
-              boxShadow: '0 0 10px 0 #ccffcc',
-              position: 'fixed',
-              zIndex: '1',
-              left: '15px',
-              bottom: '15px',
-            }}>
-            <LibraryBooksIcon />
-          </IconButton>
-          <SwipeableDrawer
-            anchor={'left'}
-            open={showDrawer}
-            onClose={toggleDrawer(false)}
-            onOpen={toggleDrawer(true)}
-          >
-            <Box
+        <>
+          <EditDrawerArray />
+          <React.Fragment key={'left'}>
+            <IconButton
+              onClick={toggleDrawer(true)}
               style={{
-                // width: "100px",
-                height: "100%",
-              }}
-              sx={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                flexDirection: 'column',
-                justifyContent: 'space-between'
-              }}
+                backgroundColor: '#ddffdd',
+                boxShadow: '0 0 10px 0 #ccffcc',
+                position: 'fixed',
+                zIndex: '1',
+                left: '15px',
+                bottom: '15px',
+              }}>
+              <LibraryBooksIcon />
+            </IconButton>
+            <SwipeableDrawer
+              anchor={'left'}
+              open={showDrawer}
+              onClose={toggleDrawer(false)}
+              onOpen={toggleDrawer(true)}
             >
               <Box
                 style={{
-                  height: "90%",
-                  width: "300px",
-                  overflowY: "scroll",
-                  overflowX: "hidden",
+                  // width: "100px",
+                  height: "100%",
+                }}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between'
                 }}
               >
+                <Box
+                  style={{
+                    height: "50px"
+                  }}
+                >
+                  <IconButton href="https://github.com/shampooma/notes" target="_blank">
+                    <GitHubIcon />
+                  </IconButton>
+                  <IconButton
+                    onClick={() => location.reload()}
+                  >
+                    <CachedIcon />
+                  </IconButton>
+                  <IconButton
+                    onClick={() => editDrawerOnclick(editingDocumentArray)}
+                  >
+                    {editingDocumentArray ? <DoneIcon /> : <EditIcon />}
 
-                <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-                  {
-                    list.map((item, i) => {
-                      return (
-                        <ListItemButton
-                          alignItems="flex-start"
-                          key={i}
-                          onClick={() => dispatch(setDocumentIndex(i))}
-                        >
-                          <ListItemAvatar>
-                          </ListItemAvatar>
-                          <ListItemText
-                            primary={item.name}
-                            secondary={item.type}
-                          />
-                        </ListItemButton>
-                      )
-                    })
-                  }
-                  <ListItem key={-1}>
-                    <Box
-                      style={{
-                        width: "100%"
-                      }}
-                      sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <IconButton onClick={drawerAddDocumentButton}>
-                        <AddIcon></AddIcon>
-                      </IconButton>
-                    </Box>
-                  </ListItem>
-                </List>
+                  </IconButton>
+                </Box>
+                <Box
+                  style={{
+                    height: "90%",
+                    width: "300px",
+                    overflowY: "scroll",
+                    overflowX: "hidden",
+                  }}
+                >
+
+                  <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
+                    {list.map((item, i) => <DocumentItem
+                      item={item}
+                      i={i}
+                    />)}
+                    <ListItem key={-1}>
+                      <Box
+                        style={{
+                          width: "100%",
+                        }}
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <IconButton onClick={drawerAddDocumentButton}>
+                          <AddIcon></AddIcon>
+                        </IconButton>
+                      </Box>
+                    </ListItem>
+                  </List>
+                </Box>
+
               </Box>
-              <Box
-                style={{
-                  height: "50px"
-                }}
-              >
-                <IconButton href="https://github.com/shampooma/notes" target="_blank">
-                  <GitHubIcon></GitHubIcon>
-                </IconButton>
-              </Box>
-            </Box>
-          </SwipeableDrawer>
-        </React.Fragment>
+            </SwipeableDrawer>
+          </React.Fragment>
+        </>
       }
     </div>
   );
 }
+
+export default SwipeableTemporaryDrawer;

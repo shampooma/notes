@@ -12,7 +12,6 @@ import { pushLoading, deleteLoading } from "components/Loading/Loading_slice";
 import Box from '@mui/material/Box';
 
 const IndexPage = () => {
-  console.log("index.tsx");
   // ____ _    ____ ___  ____ _       ____ ___ ____ ___ ____
   // | __ |    |  | |__] |__| |       [__   |  |__|  |  |___
   // |__] |___ |__| |__] |  | |___    ___]  |  |  |  |  |___
@@ -21,7 +20,7 @@ const IndexPage = () => {
     return {
       db: state.index.db,
       documentIndex: state.index.documentIndex,
-      documentArray: state.Drawer.documentArray
+      documentArray: state.Drawer.drawer.documentArray
     }
   })
 

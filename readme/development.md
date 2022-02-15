@@ -103,7 +103,7 @@ How to use refer to *_slice.ts
 0. Change the slice
     ```ts
     import { createSlice, combineReducers, PayloadAction } from '@reduxjs/toolkit';
-    import { component2Reducer } from "pages/Component1/Component2"; // Import reducers in same directory (Only for the head in the directory)
+    import { component2Reducer } from "components/Component1/Component2"; // Import reducers in same directory 
 
     export const component1Slice = createSlice({ // Slice copntains reducers and actions
       name: 'Component1',
@@ -119,11 +119,7 @@ How to use refer to *_slice.ts
       },
     });
 
-    export const { // Return actions
-      setState1,
-    } = component1Slice.actions
-
-    export const component1Reducer = combineReducers({ // Return combined reducers, if not the head of directory, just return a reducer is ok
+    export const component1Reducer = combineReducers({
       component1: component1Slice.reducer,
       component2: combineReducers
     });
@@ -151,7 +147,7 @@ How to use refer to *_slice.ts
 
 ```tsx
 import * as React from "react"
-import { useAppSelector, useAppDispatch } from "others/index_hooks"; // Import hooks for redux, just added typing for useSelector and useDispatch
+import { useIndexSelector, useIndexDispatch } from "components/index/index_hooks"; // Import hooks for redux, just added typing for useSelector and useDispatch
 import { setState0 } from "others/Component0_slice"; // Import redux actions
 
 const Component1 = ({ // Define parameters and corresponding data type
@@ -162,10 +158,10 @@ const Component1 = ({ // Define parameters and corresponding data type
   // ____ _    ____ ___  ____ _       ____ ___ ____ ___ ____
   // | __ |    |  | |__] |__| |       [__   |  |__|  |  |___
   // |__] |___ |__| |__] |  | |___    ___]  |  |  |  |  |___
-  const dispatch = useAppDispatch();
-  const { db, state0 } = useAppSelector((state) => { // Get global state that needed
+  const dispatch = useIndexDispatch();
+  const { db, state0 } = useIndexSelector((state) => { // Get global state that needed
     return {
-      db: state.app.db,
+      db: state.index.db,
       state0: state.Component0.state0,
     }
   });
@@ -180,12 +176,21 @@ const Component1 = ({ // Define parameters and corresponding data type
   // _  _ ____ ____    ____ ____ ____ ____ ____ ___
   // |  | [__  |___    |___ |___ |___ |___ |     |
   // |__| ___] |___    |___ |    |    |___ |___  |
-  React.useEffect(() => {}, []);
+  React.useEffect(() => {
+    (async () => {
+      await new Promise((res, rej) => {})
+    })();
+  }, []);
 
   // ____ _  _ _  _ ____ ___ _ ____ _  _ ____
   // |___ |  | |\ | |     |  | |  | |\ | [__
   // |    |__| | \| |___  |  | |__| | \| ___]
-  const function0 = React.useCallback(() => {}, []); // use Callback to reduce computation when re-render
+  const function0 = React.useCallback(async () => {
+    try {
+    } catch (e) {
+    } finally {
+    }
+  }, []); // use Callback to reduce computation when re-render
 
   // ____ ____ ___ _  _ ____ _  _
   // |__/ |___  |  |  | |__/ |\ |
@@ -202,47 +207,33 @@ export default Component1;
 
 DB configs are stored in `src/indexeddb/config.ts`
 
-<h3>1.4.1 Upgrade</h3>
+<h3>1.4.1 Using APIs</h3>
 
-0. Change `DBCurrentVersion`, `DBMaxVersion` in `indexeddb/config.ts`
 
-1. Add a folder `vx` to `indexeddb/versions`
-    ```sh
-    vx/  // For React component that not rendered as pages
-    ├── type.ts
-    ├── api.ts
-    └── changeVersion.ts
-    ```
-    
-2. Add `types` and `enum` to `indexeddb/versions/vx/type.ts`
-    ```ts
-    import { DBoldRecordV0 } from "indexeddb/version/v0";
 
-    export interface DBNewRecordV1 extends DBoldRecordV0 {};
+```ts
+import { DBStoreNameV2} from "indexeddb/type";
 
-    export interface newRecordV1 { id: string }
-    ```
+try {
+  dispatch(pushLoading(LoadingString.components_StockList_StockList_add));
+  const items = await new Promise((res, rej) => {
+    const request = db.transaction(DBStoreNameV2.stockRecordStore, "readonly").objectStore(DBStoreNameV2.stockRecordStore).getAll();
   
-3. Add `upgrade` to `indexeddb/versions/vx/changeVersion.ts`
-
-    ```ts
-    import { newRecordV1 } from 'indexeddb/versions/vx/type.ts'
-    export const upgradeVx = (e: IDBVersionChangeEvent, request: IDBOpenDBRequest) => {}
-    ```
-
-4. Add APIs to `indexeddb/versions/vx/api.ts`, should return Promise
-
-    ```ts
-    const readStore = (db: IDBDatabase, itemId: number): Promise<number> => {
-      return new Promise((res, rej) => {
-        res(0);
-      })
+    request.onerror = (e) => {
+      console.log(e);
+      rej(e);
     }
-    ```
-
-5. (Add new type to || delete useless type from) `indexeddb/type.ts`
-
-6. Add `upgradeVx` to `indexeddb/changeVersion.ts`, it will be executed by `pages/index.tsx`
+  
+    request.onsuccess = () => {
+      res(request.result);
+    }
+  });
+  dispatch(deleteLoading(LoadingString.components_StockList_StockLis)
+} catch (e) {
+  console.log(e);
+  dispatch(deleteLoading(LoadingString.components_StockList_StockLis))
+}
+```
 
 <h2 id="1.5.">1.5. Convensions</h2>
 

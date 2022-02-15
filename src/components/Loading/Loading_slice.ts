@@ -1,4 +1,3 @@
-import { DBDocumentV2 } from "indexeddb/type";
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export const LoadingSlice = createSlice({
