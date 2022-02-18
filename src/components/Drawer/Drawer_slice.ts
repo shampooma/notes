@@ -11,13 +11,13 @@ export const DrawerSlice = createSlice({
     documentArray: DBDocumentStoreItemV2[],
   },
   reducers: {
-    setDrawerList: (state, action: PayloadAction<DBDocumentStoreItemV2[]>) => {
+    setDrawerArray: (state, action: PayloadAction<DBDocumentStoreItemV2[]>) => {
       state.documentArray = action.payload;
     },
   },
 });
 
-export const { setDrawerList } = DrawerSlice.actions;
+export const { setDrawerArray } = DrawerSlice.actions;
 
 export const DrawerReducer = combineReducers({ // Return combined reducers, if not the head of directory, just return a reducer is ok
   editDrawerArray: editDrawerArraySlice.reducer,

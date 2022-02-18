@@ -131,7 +131,7 @@ const CustomListItem = ({
     >
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
-          Confirm to delete stock Item ?
+          Confirm to delete {stockRecordArray[index].name}?
         </DialogContentText>
       </DialogContent>
       <DialogActions>

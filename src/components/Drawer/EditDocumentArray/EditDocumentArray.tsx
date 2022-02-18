@@ -10,7 +10,8 @@ import Button from '@mui/material/Button';
 import { DBDocumentStoreItemV2, DBDocumentTypeV2, DBStoreNameV2} from "indexeddb/type";
 import { pushLoading, deleteLoading } from "components/Loading/Loading_slice";
 import { LoadingString } from "components/Loading/Loading_type";
-import { setDrawerList } from "../Drawer_slice";
+import { setDrawerArray } from "../Drawer_slice";
+import { setArrayIndex } from "components/Drawer/EditDocumentArray/EditDocumentArray_slice";
 
 const EditDrawerArray = () => {
   // ____ _    ____ ___  ____ _       ____ ___ ____ ___ ____
@@ -89,7 +90,7 @@ const EditDrawerArray = () => {
         }
       
         request.onsuccess = () => {
-          dispatch(setDrawerList(request.result));
+          dispatch(setDrawerArray(request.result));
           res(0);
         }
       });
@@ -102,13 +103,18 @@ const EditDrawerArray = () => {
     }
   }, [editingDocumentItemName]); // use Callback to reduce computation when re-render
 
+  const dialogOnclose = React.useCallback(() => {
+    dispatch(setEditingDocumentItem(false));
+    dispatch(setArrayIndex(-1));
+  }, [])
+
   // ____ ____ ___ _  _ ____ _  _
   // |__/ |___  |  |  | |__/ |\ |
   // |  \ |___  |  |__| |  \ | \|
   return (<>
     <Dialog
       open={editingDocumentItem}
-      onClose={() => dispatch(setEditingDocumentItem(false))}
+      onClose={dialogOnclose}
     >
       <Box
         display="flex"

@@ -8,7 +8,7 @@ import * as React from 'react';
 import { useIndexSelector, useIndexDispatch } from "components/index/index_hooks";
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
-import { setDrawerList } from 'components/Drawer/Drawer_slice';
+import { setDrawerArray } from 'components/Drawer/Drawer_slice';
 import { pushLoading, deleteLoading } from "components/Loading/Loading_slice";
 import { DBStoreNameV2 } from 'indexeddb/type';
 import { LoadingString } from 'components/Loading/Loading_type';
@@ -54,10 +54,11 @@ const SwipeableTemporaryDrawer = () => {
           }
 
           request.onsuccess = () => {
-            dispatch(setDrawerList(request.result));
+            dispatch(setDrawerArray(request.result));
             res(0);
           }
         })
+        
         dispatch(deleteLoading(LoadingString.components_Drawer_Drawer_loadDocument));
       } catch (e) {
         console.log(e);
@@ -83,6 +84,11 @@ const SwipeableTemporaryDrawer = () => {
 
         setShowDrawer(open);
       };
+
+  const drawerOnClose = React.useCallback(() => {
+    dispatch(setEditingDocumentArray(false));
+    setShowDrawer(false);
+  }, [])
 
   const drawerAddDocumentButton = async () => {
     try {
@@ -133,7 +139,8 @@ const SwipeableTemporaryDrawer = () => {
         }
 
         request.onsuccess = () => {
-          dispatch(setDrawerList(request.result));
+          console.log(request.result)
+          dispatch(setDrawerArray(request.result));
           res(0);
         }
       })
@@ -163,14 +170,14 @@ const SwipeableTemporaryDrawer = () => {
                 position: 'fixed',
                 zIndex: '1',
                 left: '15px',
-                bottom: '15px',
+                bottom: '30px',
               }}>
               <LibraryBooksIcon />
             </IconButton>
             <SwipeableDrawer
               anchor={'left'}
               open={showDrawer}
-              onClose={toggleDrawer(false)}
+              onClose={drawerOnClose}
               onOpen={toggleDrawer(true)}
             >
               <Box
@@ -218,6 +225,7 @@ const SwipeableTemporaryDrawer = () => {
                     {list.map((item, i) => <DocumentItem
                       item={item}
                       i={i}
+                      key={i}
                     />)}
                     <ListItem key={-1}>
                       <Box

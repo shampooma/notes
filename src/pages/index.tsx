@@ -112,7 +112,7 @@ const IndexPage = () => {
               display="flex"
               justifyContent="center"
             >
-              <h1>Please create new document</h1>
+              <h1>No document have been selected</h1>
             </Box> :
             <>
               <StockList></StockList>

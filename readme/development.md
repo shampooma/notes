@@ -213,9 +213,12 @@ DB configs are stored in `src/indexeddb/config.ts`
 
 ```ts
 import { DBStoreNameV2} from "indexeddb/type";
+import { pushLoading, deleteLoading } from "components/Loading/Loading_slice";
+import { LoadingString } from 'components/Loading/Loading_type';
 
-try {
-  dispatch(pushLoading(LoadingString.components_StockList_StockList_add));
+dispatch(pushLoading(LoadingString.loading_enum));
+
+try {s
   const items = await new Promise((res, rej) => {
     const request = db.transaction(DBStoreNameV2.stockRecordStore, "readonly").objectStore(DBStoreNameV2.stockRecordStore).getAll();
   
@@ -228,10 +231,10 @@ try {
       res(request.result);
     }
   });
-  dispatch(deleteLoading(LoadingString.components_StockList_StockLis)
 } catch (e) {
   console.log(e);
-  dispatch(deleteLoading(LoadingString.components_StockList_StockLis))
+} finally {
+  dispatch(deleteLoading(LoadingString.loading_enum))
 }
 ```
 

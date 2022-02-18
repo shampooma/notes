@@ -126,7 +126,7 @@ const StockList = () => {
       console.log(e);
       dispatch(deleteLoading(LoadingString.components_StockList_StockList_add))
     }
-  }, [db]);
+  }, [db, documentArray, documentIndex]);
 
   return (
     <main>
