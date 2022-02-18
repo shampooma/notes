@@ -18,15 +18,14 @@
 
 - Option 0: visit GitHub page
 
-  <a href=https://shampooma.github.io/notes/>https://shampooma.github.io/notes/</a>
+  <a href="https://shampooma.github.io/notes/">https://shampooma.github.io/notes/</a>
 
 - Option 1: Host the website by docker
-
-  Set `PROCESS_MODE=prod` in `.env`
 
   ```bash
   git clone -b main https://github.com/shampooma/notes.git
   cd notes
+  sed -i 's/PROCESS_MODE=.*/PROCESS_MODE=prod/' .env
   ./start.sh build
   ./start.sh up -d
   ```
