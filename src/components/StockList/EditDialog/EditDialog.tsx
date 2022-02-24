@@ -76,6 +76,10 @@ const EditDialog = () => {
     try {
       dispatch(pushLoading(LoadingString.components_StockList_EditDialog_update));
 
+      if (Number(addPosition) == 0) {
+        return;
+      }
+
       // Read stockStoreItem
       const stockStoreItem = await new Promise<DBStockStoreItemV2>((res, rej) => {
         const request = db.transaction(DBStoreNameV2.stockRecordStore, 'readwrite').objectStore(DBStoreNameV2.stockRecordStore).get(documentArray[documentIndex].recordId);
@@ -122,9 +126,9 @@ const EditDialog = () => {
         }
       });
 
-      dispatch(deleteLoading(LoadingString.components_StockList_EditDialog_update));
     } catch (e) {
       console.log(e);
+    } finally {
       dispatch(deleteLoading(LoadingString.components_StockList_EditDialog_update));
     }
   }, [

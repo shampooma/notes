@@ -209,8 +209,6 @@ DB configs are stored in `src/indexeddb/config.ts`
 
 <h3>1.4.1 Using APIs</h3>
 
-
-
 ```ts
 import { DBStoreNameV2} from "indexeddb/type";
 import { pushLoading, deleteLoading } from "components/Loading/Loading_slice";
