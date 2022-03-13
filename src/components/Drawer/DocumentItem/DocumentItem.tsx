@@ -1,5 +1,4 @@
 import { useIndexSelector, useIndexDispatch } from "components/index/index_hooks";
-import { DBDocumentStoreItemV2 } from "indexeddb/type";
 import { setArrayIndex, setEditingDocumentItem } from "components/Drawer/EditDocumentArray/EditDocumentArray_slice";
 
 import ListItemText from '@mui/material/ListItemText';
@@ -9,7 +8,6 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { setDocumentIndex } from "components/index/index_slice";
 import * as React from 'react';
 import { Button } from "@mui/material";
-import { DBStoreNameV2 } from "indexeddb/type";
 import { pushLoading, deleteLoading } from "components/Loading/Loading_slice";
 import { LoadingString } from 'components/Loading/Loading_type';
 import { setDrawerArray } from "components/Drawer/Drawer_slice";
@@ -17,21 +15,21 @@ import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContentText from "@mui/material/DialogContentText";
+import { db, DBDocumentStoreItem } from "database/db";
 
 const DocumentItem = ({
   item,
   i
 }: {
-  item: DBDocumentStoreItemV2,
+  item: DBDocumentStoreItem,
   i: number
 }) => {
   // ____ _    ____ ___  ____ _       ____ ___ ____ ___ ____
   // | __ |    |  | |__] |__| |       [__   |  |__|  |  |___
   // |__] |___ |__| |__] |  | |___    ___]  |  |  |  |  |___
   const dispatch = useIndexDispatch();
-  const { db, editingDocumentArray, documentArray } = useIndexSelector((state) => {
+  const { editingDocumentArray, documentArray } = useIndexSelector((state) => {
     return {
-      db: state.index.db as IDBDatabase,
       editingDocumentArray: state.Drawer.editDrawerArray.editingDocumentArray,
       documentArray: state.Drawer.drawer.documentArray,
     }
@@ -82,42 +80,19 @@ const DocumentItem = ({
     dispatch(pushLoading(LoadingString.components_Drawer_DocumentItem_deleteDocument));
 
     try {
-      await new Promise((res, rej) => {
-        const request = db.transaction(DBStoreNameV2.documentStore, "readwrite").objectStore(DBStoreNameV2.documentStore).delete(documentArray[i].id);
+      await db.documentStore.delete(documentArray[i].id);
 
-        request.onerror = (e) => {
-          console.log(e);
-          rej(e);
-        }
+      const documents = await db.documentStore.toArray();
 
-        request.onsuccess = () => {
-          res(0);
-        }
-      });
-
-      await new Promise((res, rej) => {
-        const request = db.transaction(DBStoreNameV2.documentStore, "readonly").objectStore(DBStoreNameV2.documentStore).getAll()
-
-        request.onerror = (e) => {
-          console.log(e);
-          rej(e);
-        }
-
-        request.onsuccess = () => {
-          console.log(request.result)
-          dispatch(setDocumentIndex(-1))
-          dispatch(setDrawerArray(request.result));
-          res(0);
-        }
-      });
-
+      dispatch(setDocumentIndex(-1));
+      dispatch(setDrawerArray(documents));
     } catch (e) {
       console.log(e);
     } finally {
       setShowDeleteWarning(false);
       dispatch(deleteLoading(LoadingString.components_Drawer_DocumentItem_deleteDocument));
     }
-  },  [documentArray]);
+  }, [documentArray]);
 
   return (
     <>

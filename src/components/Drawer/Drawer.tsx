@@ -10,7 +10,6 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import { setDrawerArray } from 'components/Drawer/Drawer_slice';
 import { pushLoading, deleteLoading } from "components/Loading/Loading_slice";
-import { DBStoreNameV2 } from 'indexeddb/type';
 import { LoadingString } from 'components/Loading/Loading_type';
 import CachedIcon from '@mui/icons-material/Cached';
 import EditIcon from '@mui/icons-material/Edit';
@@ -18,15 +17,15 @@ import DoneIcon from '@mui/icons-material/Done';
 import DocumentItem from "components/Drawer/DocumentItem/DocumentItem";
 import { setEditingDocumentArray } from 'components/Drawer/EditDocumentArray/EditDocumentArray_slice';
 import EditDrawerArray from 'components/Drawer/EditDocumentArray/EditDocumentArray';
+import {db} from "database/db";
 
 const SwipeableTemporaryDrawer = () => {
   // ____ _    ____ ___  ____ _       ____ ___ ____ ___ ____
   // | __ |    |  | |__] |__| |       [__   |  |__|  |  |___
   // |__] |___ |__| |__] |  | |___    ___]  |  |  |  |  |___
   const dispatch = useIndexDispatch();
-  const { db, list, editingDocumentArray } = useIndexSelector((state) => {
+  const { list, editingDocumentArray } = useIndexSelector((state) => {
     return {
-      db: state.index.db as IDBDatabase,
       list: state.Drawer.drawer.documentArray,
       editingDocumentArray: state.Drawer.editDrawerArray.editingDocumentArray,
     }
@@ -40,25 +39,15 @@ const SwipeableTemporaryDrawer = () => {
   // _  _ ____ ____    ____ ____ ____ ____ ____ ___
   // |  | [__  |___    |___ |___ |___ |___ |     |
   // |__| ___] |___    |___ |    |    |___ |___  |
+  // Read all document
   React.useEffect(() => {
     (async () => {
-      // Read all document
+      dispatch(pushLoading(LoadingString.components_Drawer_Drawer_loadDocument));
       try {
-        dispatch(pushLoading(LoadingString.components_Drawer_Drawer_loadDocument));
+        const documents = await db.documentStore.toArray();
 
-        await new Promise((res, rej) => {
-          const request = db.transaction(DBStoreNameV2.documentStore, "readonly").objectStore(DBStoreNameV2.documentStore).getAll();
+        dispatch(setDrawerArray(documents));
 
-          request.onerror = (e) => {
-            rej(e);
-          }
-
-          request.onsuccess = () => {
-            dispatch(setDrawerArray(request.result));
-            res(0);
-          }
-        })
-        
         dispatch(deleteLoading(LoadingString.components_Drawer_Drawer_loadDocument));
       } catch (e) {
         console.log(e);
@@ -99,17 +88,8 @@ const SwipeableTemporaryDrawer = () => {
       }
 
       // Add new stockRecord
-      const newStockRecordId = await new Promise((res, rej) => {
-        const request = db.transaction(DBStoreNameV2.stockRecordStore, "readwrite").objectStore(DBStoreNameV2.stockRecordStore).add(newStockRecord);
+      const newStockRecordId = await db.stockRecordStore.add(newStockRecord) as number;
 
-        request.onerror = (e) => {
-          rej(e);
-        }
-
-        request.onsuccess = () => {
-          res(request.result);
-        }
-      })
 
       const newDocument = {
         name: "newDocument",
@@ -118,36 +98,15 @@ const SwipeableTemporaryDrawer = () => {
       }
 
       // Add new document
-      await new Promise((res, rej) => {
-        const request = db.transaction(DBStoreNameV2.documentStore, "readwrite").objectStore(DBStoreNameV2.documentStore).add(newDocument);
-
-        request.onerror = (e) => {
-          rej(e);
-        }
-
-        request.onsuccess = () => {
-          res(0);
-        }
-      })
+      await db.documentStore.add(newDocument);
 
       // Read all document
-      await new Promise((res, rej) => {
-        const request = db.transaction(DBStoreNameV2.documentStore, "readonly").objectStore(DBStoreNameV2.documentStore).getAll();
+      const documents = await db.documentStore.toArray();
 
-        request.onerror = (e) => {
-          rej(e);
-        }
-
-        request.onsuccess = () => {
-          console.log(request.result)
-          dispatch(setDrawerArray(request.result));
-          res(0);
-        }
-      })
-
-      dispatch(deleteLoading(LoadingString.components_Drawer_Drawer_addDocument));
+      dispatch(setDrawerArray(documents));
     } catch (e) {
       console.log(e);
+    } finally {
       dispatch(deleteLoading(LoadingString.components_Drawer_Drawer_addDocument));
     }
   }

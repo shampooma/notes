@@ -4,7 +4,7 @@
 export $(cat .env | sed 's/#.*//g' | xargs)
 
 # Set PROCESS_MODE to dev if it is not prod
-if ["$PROCESS_MODE" != "prod"]; then
+if [ $PROCESS_MODE != "prod" ]; then
   export PROCESS_MODE=dev
 fi
 

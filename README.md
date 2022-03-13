@@ -12,9 +12,9 @@
 
 ---
 
-<h1 id="0.">0. Quick start</h1>
+<h1 id="Quick start">Quick start</h1>
 
-<h2>0.1. Get the site ready</h2>
+<h2>0. Get the site ready</h2>
 
 - Option 0: visit GitHub page
 
@@ -44,6 +44,6 @@
 
   visit: <a href=http://localhost:9000>http://localhost:9000</a>
 
-<h2>0.1. Install on mobile phone</h2>
+<h2>1. Install on mobile phone</h2>
 
 Find a way for `Add to home screen`

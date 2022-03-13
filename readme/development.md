@@ -4,44 +4,46 @@
 
 <h1 align="center">Notes</h1>
 
-[0. Quick start](../README.md)
+[Quick start](../README.md)
 
-<span>1. Development</span>
+<span>Development</span>
 
 [2. Deployment](./deployment.md)
 
 ---
 
-<h1 id="1.">1. Development</h1>
+<h1 id="1.">Development</h1>
 
 > (NOTE) Should use dev branch
 >
 > (NOTE) PWA only works for production mode
 
-[1.0. Procedures](#1.0.)
+[0. Procedures](#1.0.)
 
-[1.1. File structure](#1.1.)
+[1. File structure](#1.1.)
 
-[1.2. State management](#1.2.)
+[2. State management](#2.)
 
-[1.3. Pages && Components](#1.3.)
+[3. Pages && Components](#3.)
 
-[1.4. IndexedDB](#1.4.)
+[4. Database](#4.)
 
-[1.5. Convensions](1.5.)
+[5. Convensions](5.)
 
-[1.6. Bugs](#1.6.)
+[6. Install packages](6.)
 
-<h2 id="1.0.">1.0. Procedures</h2>
+[7. Bugs](#7.)
 
-<h3>1.0.0. Clone git repository</h3>
+<h2 id="0.">0. Procedures</h2>
+
+<h3>0.0. Clone git repository</h3>
 
 ```sh
 git clone -b dev https://github.com/shampooma/notes.git
 cd notes
 ```
 
-<h3 id="1.1.1.">1.0.1. Start server</h3>
+<h3>0.1. Start server</h3>
 
 - Option 0: Use docker
 
@@ -58,7 +60,7 @@ cd notes
   npm run start
   ```
 
-<h2 id="1.1.">1.1. File structure</h2>
+<h2 id="1.">1. File structure</h2>
 
 ```bash
 src/
@@ -90,20 +92,20 @@ src/
     └── style0.css
 ```
 
-<h2 id="1.2.">1.2. State management</h2>
+<h2 id="2.">2. State management</h2>
 
-<h3>1.2.0. Tech</h3>
+<h3>2.0. Tech</h3>
 
 0. Redux
 
-<h3>1.2.1. Global state</h3>
+<h3>2.1. Global state</h3>
 
 How to use refer to *_slice.ts
 
 0. Change the slice
     ```ts
     import { createSlice, combineReducers, PayloadAction } from '@reduxjs/toolkit';
-    import { component2Reducer } from "components/Component1/Component2"; // Import reducers in same directory 
+    import { component2Reducer } from "components/Component1/Component2"; // Import reducers in same directory
 
     export const component1Slice = createSlice({ // Slice copntains reducers and actions
       name: 'Component1',
@@ -143,7 +145,7 @@ How to use refer to *_slice.ts
     export type AppDispatch = typeof store.dispatch
     ```
 
-<h2 id="1.3.">1.3. Pages && Components</h2>
+<h2 id="3.">3. Pages && Components</h2>
 
 ```tsx
 import * as React from "react"
@@ -201,13 +203,13 @@ const Component1 = ({ // Define parameters and corresponding data type
 export default Component1;
 ```
 
-<h2 id="1.4.">1.4. IndexedDB</h2>
+<h2 id="4.">4. Database</h2>
 
-<h3>1.4.0 Config</h4>
+<h3>4.0. Tech</h4>
 
-DB configs are stored in `src/indexeddb/config.ts`
+Using Dexie
 
-<h3>1.4.1 Using APIs</h3>
+<h3>4.1. Using APIs</h3>
 
 ```ts
 import { DBStoreNameV2} from "indexeddb/type";
@@ -219,12 +221,12 @@ dispatch(pushLoading(LoadingString.loading_enum));
 try {s
   const items = await new Promise((res, rej) => {
     const request = db.transaction(DBStoreNameV2.stockRecordStore, "readonly").objectStore(DBStoreNameV2.stockRecordStore).getAll();
-  
+
     request.onerror = (e) => {
       console.log(e);
       rej(e);
     }
-  
+
     request.onsuccess = () => {
       res(request.result);
     }
@@ -236,15 +238,15 @@ try {s
 }
 ```
 
-<h2 id="1.5.">1.5. Convensions</h2>
+<h2 id="5.">5. Convensions</h2>
 
-<h3>1.5.0. Naming</h3>
+<h3>5.0. Naming</h3>
 
 If the variable not only used in certain area, it should contain prefix that indicate what this variable used for, such as `DBUpgrade`
 
-<h3>1.5.1. Error handling</h3>
+<h3>5.1. Error handling</h3>
 
-Error should handled within same file 
+Error should handled within same file
 
 ```ts
 const fun = () => {
@@ -256,7 +258,13 @@ const fun = () => {
 }
 ```
 
-<h2 id="1.6.">1.6. Bugs</h2>
+<h2 id="6.">6. Install packages</h2>
+
+```sh
+docker exec notes_dev_1 npm i package
+```
+
+<h2 id="7.">7. Bugs</h2>
 
 <h3>Bug 0</h3>
 
