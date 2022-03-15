@@ -17,7 +17,9 @@ import DoneIcon from '@mui/icons-material/Done';
 import DocumentItem from "components/Drawer/DocumentItem/DocumentItem";
 import { setEditingDocumentArray } from 'components/Drawer/EditDocumentArray/EditDocumentArray_slice';
 import EditDrawerArray from 'components/Drawer/EditDocumentArray/EditDocumentArray';
-import {db} from "database/db";
+import { db } from "database/db";
+import { setCreatingDocument } from 'components/Drawer/NewDocument/NewDocument_slice';
+import NewDocument from "components/Drawer/NewDocument/NewDocument";
 
 const SwipeableTemporaryDrawer = () => {
   // ____ _    ____ ___  ____ _       ____ ___ ____ ___ ____
@@ -36,9 +38,9 @@ const SwipeableTemporaryDrawer = () => {
   // |___ |__| |___ |  | |___    ___]  |  |  |  |  |___
   const [showDrawer, setShowDrawer] = React.useState(false);
 
-  // _  _ ____ ____    ____ ____ ____ ____ ____ ___
-  // |  | [__  |___    |___ |___ |___ |___ |     |
-  // |__| ___] |___    |___ |    |    |___ |___  |
+  // _  _ ____ ____    _  _ ____ ____ _  _ ____
+  // |  | [__  |___    |__| |  | |  | |_/  [__
+  // |__| ___] |___    |  | |__| |__| | \_ ___]
   // Read all document
   React.useEffect(() => {
     (async () => {
@@ -79,37 +81,9 @@ const SwipeableTemporaryDrawer = () => {
     setShowDrawer(false);
   }, [])
 
-  const drawerAddDocumentButton = async () => {
-    try {
-      dispatch(pushLoading(LoadingString.components_Drawer_Drawer_addDocument));
-
-      const newStockRecord = {
-        stockRecordArray: []
-      }
-
-      // Add new stockRecord
-      const newStockRecordId = await db.stockRecordStore.add(newStockRecord) as number;
-
-
-      const newDocument = {
-        name: "newDocument",
-        recordId: newStockRecordId,
-        type: "stock",
-      }
-
-      // Add new document
-      await db.documentStore.add(newDocument);
-
-      // Read all document
-      const documents = await db.documentStore.toArray();
-
-      dispatch(setDrawerArray(documents));
-    } catch (e) {
-      console.log(e);
-    } finally {
-      dispatch(deleteLoading(LoadingString.components_Drawer_Drawer_addDocument));
-    }
-  }
+  const drawerAddDocumentButton = React.useCallback(() => {
+    dispatch(setCreatingDocument(true));
+  }, []);
 
   const editDrawerOnclick = React.useCallback((editingDocumentArray) => {
     dispatch(setEditingDocumentArray(!editingDocumentArray));
@@ -117,98 +91,94 @@ const SwipeableTemporaryDrawer = () => {
 
   return (
     <div>
-      {
-        <>
-          <EditDrawerArray />
-          <React.Fragment key={'left'}>
-            <IconButton
-              onClick={toggleDrawer(true)}
+      <EditDrawerArray />
+      <NewDocument />
+      <React.Fragment key={'left'}>
+        <IconButton
+          onClick={toggleDrawer(true)}
+          style={{
+            backgroundColor: '#ddffdd',
+            boxShadow: '0 0 10px 0 #ccffcc',
+            position: 'fixed',
+            zIndex: '1',
+            left: '15px',
+            bottom: '30px',
+          }}>
+          <LibraryBooksIcon />
+        </IconButton>
+        <SwipeableDrawer
+          anchor={'left'}
+          open={showDrawer}
+          onClose={drawerOnClose}
+          onOpen={toggleDrawer(true)}
+        >
+          <Box
+            style={{
+              height: "100%",
+            }}
+            sx={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              flexDirection: 'column',
+              justifyContent: 'space-between'
+            }}
+          >
+            <Box
               style={{
-                backgroundColor: '#ddffdd',
-                boxShadow: '0 0 10px 0 #ccffcc',
-                position: 'fixed',
-                zIndex: '1',
-                left: '15px',
-                bottom: '30px',
-              }}>
-              <LibraryBooksIcon />
-            </IconButton>
-            <SwipeableDrawer
-              anchor={'left'}
-              open={showDrawer}
-              onClose={drawerOnClose}
-              onOpen={toggleDrawer(true)}
+                height: "50px"
+              }}
             >
-              <Box
-                style={{
-                  // width: "100px",
-                  height: "100%",
-                }}
-                sx={{
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between'
-                }}
+              <IconButton href="https://github.com/shampooma/notes" target="_blank">
+                <GitHubIcon />
+              </IconButton>
+              <IconButton
+                onClick={() => location.reload()}
               >
-                <Box
-                  style={{
-                    height: "50px"
-                  }}
-                >
-                  <IconButton href="https://github.com/shampooma/notes" target="_blank">
-                    <GitHubIcon />
-                  </IconButton>
-                  <IconButton
-                    onClick={() => location.reload()}
+                <CachedIcon />
+              </IconButton>
+              <IconButton
+                onClick={() => editDrawerOnclick(editingDocumentArray)}
+              >
+                {editingDocumentArray ? <DoneIcon /> : <EditIcon />}
+
+              </IconButton>
+            </Box>
+            <Box
+              style={{
+                height: "90%",
+                width: "300px",
+                overflowY: "scroll",
+                overflowX: "hidden",
+              }}
+            >
+
+              <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
+                {list.map((item, i) => <DocumentItem
+                  item={item}
+                  i={i}
+                  key={i}
+                />)}
+                <ListItem key={-1}>
+                  <Box
+                    style={{
+                      width: "100%",
+                    }}
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                    }}
                   >
-                    <CachedIcon />
-                  </IconButton>
-                  <IconButton
-                    onClick={() => editDrawerOnclick(editingDocumentArray)}
-                  >
-                    {editingDocumentArray ? <DoneIcon /> : <EditIcon />}
+                    <IconButton onClick={drawerAddDocumentButton}>
+                      <AddIcon></AddIcon>
+                    </IconButton>
+                  </Box>
+                </ListItem>
+              </List>
+            </Box>
 
-                  </IconButton>
-                </Box>
-                <Box
-                  style={{
-                    height: "90%",
-                    width: "300px",
-                    overflowY: "scroll",
-                    overflowX: "hidden",
-                  }}
-                >
-
-                  <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-                    {list.map((item, i) => <DocumentItem
-                      item={item}
-                      i={i}
-                      key={i}
-                    />)}
-                    <ListItem key={-1}>
-                      <Box
-                        style={{
-                          width: "100%",
-                        }}
-                        sx={{
-                          display: "flex",
-                          justifyContent: "center",
-                        }}
-                      >
-                        <IconButton onClick={drawerAddDocumentButton}>
-                          <AddIcon></AddIcon>
-                        </IconButton>
-                      </Box>
-                    </ListItem>
-                  </List>
-                </Box>
-
-              </Box>
-            </SwipeableDrawer>
-          </React.Fragment>
-        </>
-      }
+          </Box>
+        </SwipeableDrawer>
+      </React.Fragment>
     </div>
   );
 }

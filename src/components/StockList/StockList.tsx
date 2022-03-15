@@ -29,9 +29,9 @@ const StockList = () => {
   // |    |  | |    |__| |       [__   |  |__|  |  |___
   // |___ |__| |___ |  | |___    ___]  |  |  |  |  |___
 
-  // _  _ ____ ____    ____ ____ ____ ____ ____ ___
-  // |  | [__  |___    |___ |___ |___ |___ |     |
-  // |__| ___] |___    |___ |    |    |___ |___  |
+  // _  _ ____ ____    _  _ ____ ____ _  _ ____
+  // |  | [__  |___    |__| |  | |  | |_/  [__
+  // |__| ___] |___    |  | |__| |__| | \_ ___]
   // Get stockRecordArray
   React.useEffect(() => {
     (async () => {
@@ -56,7 +56,7 @@ const StockList = () => {
   // |    |__| | \| |___  |  | |__| | \| ___]
   const centerAddButtonOnclick = React.useCallback(async () => {
     dispatch(pushLoading(LoadingString.components_StockList_StockList_add));
-    
+
     try {
       // Read stockStoreItem
       let stockRecord = await db.stockRecordStore.get(documentArray[documentIndex].recordId);

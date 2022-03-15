@@ -31,9 +31,9 @@ const EditDrawerArray = () => {
   // |___ |__| |___ |  | |___    ___]  |  |  |  |  |___
   const [editingDocumentItemName, setEditingDocumentItemName] = React.useState("");
 
-  // _  _ ____ ____    ____ ____ ____ ____ ____ ___
-  // |  | [__  |___    |___ |___ |___ |___ |     |
-  // |__| ___] |___    |___ |    |    |___ |___  |
+  // _  _ ____ ____    _  _ ____ ____ _  _ ____
+  // |  | [__  |___    |__| |  | |  | |_/  [__
+  // |__| ___] |___    |  | |__| |__| | \_ ___]
   React.useEffect(() => {
     (async () => {
       if (editDrawerArrayIndex > -1) {

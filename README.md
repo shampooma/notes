@@ -4,11 +4,11 @@
 
 <h1 align="center">Notes</h1>
 
-<span>0. Quick start</span>
+<span>Quick start</span>
 
-[1. Development](./readme/development.md)
+[Development](./readme/development.md)
 
-[2. Deployment](./readme/deployment.md)
+[Deployment](./readme/deployment.md)
 
 ---
 

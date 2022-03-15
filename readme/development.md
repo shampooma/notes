@@ -8,11 +8,11 @@
 
 <span>Development</span>
 
-[2. Deployment](./deployment.md)
+[Deployment](./deployment.md)
 
 ---
 
-<h1 id="1.">Development</h1>
+<h1>Development</h1>
 
 > (NOTE) Should use dev branch
 >
@@ -105,9 +105,9 @@ How to use refer to *_slice.ts
 0. Change the slice
     ```ts
     import { createSlice, combineReducers, PayloadAction } from '@reduxjs/toolkit';
-    import { component2Reducer } from "components/Component1/Component2"; // Import reducers in same directory
+    import { Component2Reducer } from "components/Component1/Component2"; // Import reducers in same directory
 
-    export const component1Slice = createSlice({ // Slice copntains reducers and actions
+    export const Component1Slice = createSlice({ // Slice copntains reducers and actions
       name: 'Component1',
       initialState: {
         state1: value1, // State how to use
@@ -121,9 +121,11 @@ How to use refer to *_slice.ts
       },
     });
 
-    export const component1Reducer = combineReducers({
-      component1: component1Slice.reducer,
-      component2: combineReducers
+    export const { setState1 } = Component1Slice.actions;
+
+    export const Component1Reducer = combineReducers({
+      Component1: Component1Slice.reducer,
+      Component2: CombineReducers
     });
     ```
 
@@ -147,10 +149,16 @@ How to use refer to *_slice.ts
 
 <h2 id="3.">3. Pages && Components</h2>
 
+Big text generated from [https://www.fancytextpro.com/BigTextGenerator/Cybermedium](https://www.fancytextpro.com/BigTextGenerator/Cybermedium) using `Cybermedium Text Generator`
+
 ```tsx
 import * as React from "react"
 import { useIndexSelector, useIndexDispatch } from "components/index/index_hooks"; // Import hooks for redux, just added typing for useSelector and useDispatch
+import { db } from "database/db";
+import { useLiveQuery } from "dexie-react-hooks";
 import { setState0 } from "others/Component0_slice"; // Import redux actions
+import { LoadingString } from "components/Loading/Loading_type";
+import { pushLoading, deleteLoading } from "components/Loading/Loading_slice";
 
 const Component1 = ({ // Define parameters and corresponding data type
   variable1,
@@ -161,9 +169,8 @@ const Component1 = ({ // Define parameters and corresponding data type
   // | __ |    |  | |__] |__| |       [__   |  |__|  |  |___
   // |__] |___ |__| |__] |  | |___    ___]  |  |  |  |  |___
   const dispatch = useIndexDispatch();
-  const { db, state0 } = useIndexSelector((state) => { // Get global state that needed
+  const { state0 } = useIndexSelector((state) => { // Get global state that needed
     return {
-      db: state.index.db,
       state0: state.Component0.state0,
     }
   });
@@ -175,9 +182,9 @@ const Component1 = ({ // Define parameters and corresponding data type
   // |___ |__| |___ |  | |___    ___]  |  |  |  |  |___
   const [localState0, setLocalState0] = React.useState(undefined);
 
-  // _  _ ____ ____    ____ ____ ____ ____ ____ ___
-  // |  | [__  |___    |___ |___ |___ |___ |     |
-  // |__| ___] |___    |___ |    |    |___ |___  |
+  // _  _ ____ ____    _  _ ____ ____ _  _ ____
+  // |  | [__  |___    |__| |  | |  | |_/  [__
+  // |__| ___] |___    |  | |__| |__| | \_ ___]
   React.useEffect(() => {
     (async () => {
       await new Promise((res, rej) => {})

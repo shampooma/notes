@@ -54,9 +54,9 @@ const EditDialog = () => {
   const [addPrice, setAddPrice] = React.useState("0");
   const [updateName, setUpdateName] = React.useState("");
 
-  // _  _ ____ ____    ____ ____ ____ ____ ____ ___
-  // |  | [__  |___    |___ |___ |___ |___ |     |
-  // |__| ___] |___    |___ |    |    |___ |___  |
+  // _  _ ____ ____    _  _ ____ ____ _  _ ____
+  // |  | [__  |___    |__| |  | |  | |_/  [__
+  // |__| ___] |___    |  | |__| |__| | \_ ___]
   React.useEffect(() => {
     if (editDialogIndex > -1 && showEditDialog) {
       setDeletePosition("0");

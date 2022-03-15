@@ -19,34 +19,59 @@ export interface DBPutStockRecord {
   position?: number,
 }
 
+export interface DBPasswordMetaDataStoreItem {
+  id?: number,
+}
+
+export interface DBPasswordItemStoreItem {
+  id?: number,
+  passwordMetaDataStoreId: number,
+  description: string,
+  name: string,
+  password: string
+}
+
 export interface DBStockRecordStoreItem {
   id?: number,
   stockRecordArray: DBStockRecord[]
 }
 
+export enum DBDocumentTypeEnum {
+  "stock",
+  "password",
+}
+
 export interface DBDocumentStoreItem {
   id?: number,
   name: string,
-  type: string,
+  type: DBDocumentTypeEnum,
   recordId: number
 }
 
-// export class NoteDb extends Dexie {
+// class NoteDb extends Dexie {
 //   stockRecordStore!: Table<DBStockRecordStoreItem>;
+//   passwordStore!: Table<DBPasswordStoreItem>;
 //   documentStore!: Table<DBDocumentStoreItem>;
+
 
 //   constructor() {
 //     super('NoteDb');
 //     this.version(5).stores({
 //       stockRecordStore: '++id',
-//       documentStore: '++id, name, recordId'
+//       passwordStore: '++id',
+//       documentStore: '++id, name, recordId',
 //     });
 //   }
 // }
 
+// export const db = new NoteDb();
+
 
 export const db = new Dexie("NoteDb");
+
 db.version(1).stores({
   stockRecordStore: '++id',
-  documentStore: '++id, name, recordId'
-});;
+  passwordMetaDataStore: '++id',
+  documentStore: '++id, name, recordId',
+  passwordItemStore: '++id, passwordMetaDataStoreId',
+});

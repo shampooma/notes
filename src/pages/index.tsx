@@ -1,7 +1,8 @@
 import Drawer from "components/Drawer/Drawer";
 import Loading from "components/Loading/Loading";
 import StockList from "components/StockList/StockList";
-import { db } from "database/db";
+import Password from "components/Password/Password";
+import { db, DBDocumentTypeEnum } from "database/db";
 import { useIndexSelector, useIndexDispatch } from "components/index/index_hooks";
 import { setDocumentIndex, } from "components/index/index_slice";
 import * as React from "react";
@@ -15,7 +16,7 @@ const IndexPage = () => {
   const { documentIndex, documentArray } = useIndexSelector((state) => {
     return {
       documentIndex: state.index.documentIndex,
-      documentArray: state.Drawer.drawer.documentArray
+      documentArray: state.Drawer.drawer.documentArray,
     }
   })
 
@@ -23,10 +24,9 @@ const IndexPage = () => {
   // |    |  | |    |__| |       [__   |  |__|  |  |___
   // |___ |__| |___ |  | |___    ___]  |  |  |  |  |___
 
-  // _  _ ____ ____    ____ ____ ____ ____ ____ ___
-  // |  | [__  |___    |___ |___ |___ |___ |     |
-  // |__| ___] |___    |___ |    |    |___ |___  |
-
+  // _  _ ____ ____    _  _ ____ ____ _  _ ____
+  // |  | [__  |___    |__| |  | |  | |_/  [__
+  // |__| ___] |___    |  | |__| |__| | \_ ___]
   React.useEffect(() => {
     if (documentArray.length > 0 && documentIndex === -1) {
       dispatch(setDocumentIndex(0));
@@ -36,6 +36,22 @@ const IndexPage = () => {
   // ____ _  _ _  _ ____ ___ _ ____ _  _ ____
   // |___ |  | |\ | |     |  | |  | |\ | [__
   // |    |__| | \| |___  |  | |__| | \| ___]
+  const PageContent = React.useCallback(() => {
+    let Component;
+
+    switch (documentArray[documentIndex].type) {
+      case DBDocumentTypeEnum.stock:
+        Component = <StockList />
+        break;
+      case DBDocumentTypeEnum.password:
+        Component = <Password />
+        break;
+      default:
+        Component = <></>
+    }
+
+    return Component;
+  }, [documentArray, documentIndex]);
 
   // ____ ____ ___ _  _ ____ _  _
   // |__/ |___  |  |  | |__/ |\ |
@@ -54,9 +70,7 @@ const IndexPage = () => {
             >
               <h1>No document have been selected</h1>
             </Box> :
-            <>
-              <StockList></StockList>
-            </>
+            <PageContent />
         }
       </>
     }
