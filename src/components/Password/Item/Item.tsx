@@ -4,7 +4,9 @@ import { db, DBPasswordItemStoreItem } from "database/db";
 import { LoadingString } from "components/Loading/Loading_type";
 import { pushLoading, deleteLoading } from "components/Loading/Loading_slice";
 import { setIsEditing, setEditingId } from "components/Password/EditDialog/EditDialog_slice";
+import { setIsDeleting, setDeletingId } from "components/Password/DeleteDialog/DeleteDialog_slice";
 import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 
@@ -21,6 +23,7 @@ const Item = ({ // Define parameters and corresponding data type
   // _    ____ ____ ____ _       ____ ___ ____ ___ ____
   // |    |  | |    |__| |       [__   |  |__|  |  |___
   // |___ |__| |___ |  | |___    ___]  |  |  |  |  |___
+
   // _  _ ____ ____    _  _ ____ ____ _  _ ____
   // |  | [__  |___    |__| |  | |  | |_/  [__
   // |__| ___] |___    |  | |__| |__| | \_ ___]
@@ -42,7 +45,13 @@ const Item = ({ // Define parameters and corresponding data type
 
   const editIconButtonOnclick = React.useCallback(() => {
     dispatch(setIsEditing(true));
-    dispatch(setEditingId(item.id));
+    dispatch(setEditingId(item.id as number));
+  }, []);
+
+  const deleteIconButtonOnclick = React.useCallback(() => {
+    console.log(item.id)
+    dispatch(setIsDeleting(true));
+    dispatch(setDeletingId(item.id as number));
   }, []);
 
   // ____ ____ ___ _  _ ____ _  _
@@ -103,6 +112,11 @@ const Item = ({ // Define parameters and corresponding data type
         >
           <EditIcon />
         </Button>
+          <Button
+          onClick={deleteIconButtonOnclick}
+        >
+          <DeleteIcon />
+          </Button>
       </Box>
 
 

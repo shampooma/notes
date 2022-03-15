@@ -191,6 +191,11 @@ const Component1 = ({ // Define parameters and corresponding data type
     })();
   }, []);
 
+  useLiveQuery<type>(
+    () => db.store.get(0),
+    []
+  );
+
   // ____ _  _ _  _ ____ ___ _ ____ _  _ ____
   // |___ |  | |\ | |     |  | |  | |\ | [__
   // |    |__| | \| |___  |  | |__| | \| ___]

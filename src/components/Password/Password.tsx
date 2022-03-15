@@ -8,6 +8,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { LoadingString } from "components/Loading/Loading_type";
 import { pushLoading, deleteLoading } from "components/Loading/Loading_slice";
 import EditDialog from "components/Password/EditDialog/EditDialog";
+import DeleteDialog from "components/Password/DeleteDialog/DeleteDialog";
 import Item from "components/Password/Item/Item";
 import List from "@mui/material/List";
 
@@ -71,6 +72,7 @@ const Password = () => {
   } else {
     return (<>
       <EditDialog />
+      <DeleteDialog />
       <List
         sx={{px: 10}}
       >
