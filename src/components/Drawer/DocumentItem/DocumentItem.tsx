@@ -15,7 +15,7 @@ import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContentText from "@mui/material/DialogContentText";
-import { db, DBDocumentStoreItem } from "database/db";
+import { db, DBDocumentStoreItem, DBDocumentTypeEnum } from "database/db";
 
 const DocumentItem = ({
   item,
@@ -132,7 +132,7 @@ const DocumentItem = ({
         >
           <ListItemText
             primary={item.name}
-            secondary={item.type}
+            secondary={DBDocumentTypeEnum[item.type]}
           />
         </ListItemButton>
       </Box>

@@ -16,6 +16,7 @@ import ImageListItemBar from '@mui/material/ImageListItemBar';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import KeyIcon from '@mui/icons-material/Key';
 import Card from '@mui/material/Card';
+import TextField from '@mui/material/TextField';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import CardActionArea from '@mui/material/CardActionArea';
@@ -48,6 +49,8 @@ const NewDocumentDialog = () => {
   // |    |  | |    |__| |       [__   |  |__|  |  |___
   // |___ |__| |___ |  | |___    ___]  |  |  |  |  |___
   const [documentType, setDocumentType] = React.useState<DBDocumentTypeEnum>(DBDocumentTypeEnum.stock);
+  const [documentName, setDocumentName] = React.useState<string>("");
+
 
   // _  _ ____ ____    _  _ ____ ____ _  _ ____
   // |  | [__  |___    |__| |  | |  | |_/  [__
@@ -56,6 +59,10 @@ const NewDocumentDialog = () => {
   // ____ _  _ _  _ ____ ___ _ ____ _  _ ____
   // |___ |  | |\ | |     |  | |  | |\ | [__
   // |    |__| | \| |___  |  | |__| | \| ___]
+  React.useEffect(() => {
+    setDocumentName("new document")
+  }, [creatingDocument])
+
   const closeDialog = React.useCallback(() => {
     dispatch(setCreatingDocument(false));
   }, []);
@@ -89,7 +96,7 @@ const NewDocumentDialog = () => {
       }
 
       const newDocument = {
-        name: "newDocument",
+        name: documentName,
         recordId: recordId,
         type: documentType,
       }
@@ -107,7 +114,7 @@ const NewDocumentDialog = () => {
     } finally {
       dispatch(deleteLoading(LoadingString.components_Drawer_Drawer_addDocument));
     }
-  }, [documentType]);
+  }, [documentType, documentName]);
 
   // ____ ____ ___ _  _ ____ _  _
   // |__/ |___  |  |  | |__/ |\ |
@@ -119,7 +126,14 @@ const NewDocumentDialog = () => {
     maxWidth="sm"
   >
     <DialogTitle>
-      {"Create new document"}
+      <TextField
+        id="standard-basic"
+        label="Document name"
+        variant="standard"
+        value={documentName}
+        onChange={(e) => setDocumentName(e.target.value)}
+        style={{ width: "100%" }}
+      />
     </DialogTitle>
     <DialogContent
 

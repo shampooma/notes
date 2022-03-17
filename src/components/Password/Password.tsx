@@ -74,7 +74,7 @@ const Password = () => {
       <EditDialog />
       <DeleteDialog />
       <List
-        sx={{px: 10}}
+        sx={{ px: "10%" }}
       >
         {passwordArray.map((item, i) => <Item
           item={item}

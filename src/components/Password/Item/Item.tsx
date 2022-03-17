@@ -112,11 +112,11 @@ const Item = ({ // Define parameters and corresponding data type
         >
           <EditIcon />
         </Button>
-          <Button
+        <Button
           onClick={deleteIconButtonOnclick}
         >
           <DeleteIcon />
-          </Button>
+        </Button>
       </Box>
 
 
