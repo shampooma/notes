@@ -34,11 +34,13 @@ const Password = () => {
   // |  | [__  |___    |__| |  | |  | |_/  [__
   // |__| ___] |___    |  | |__| |__| | \_ ___]
   const passwordArray = useLiveQuery<DBPasswordItemStoreItem[]>(
-    () => db.passwordItemStore
-      .where('passwordMetaDataStoreId')
-      .equals(documentArray[documentIndex].recordId)
-      .toArray(),
-    [documentIndex, documentArray]
+    () => {
+      return db.passwordItemStore
+        .where('passwordMetaDataStoreId')
+        .equals(documentArray[documentIndex].recordId)
+        .toArray()
+    },
+    [documentIndex, documentArray,]
   );
 
   // ____ _  _ _  _ ____ ___ _ ____ _  _ ____
@@ -78,7 +80,7 @@ const Password = () => {
       >
         {passwordArray.map((item, i) => <Item
           item={item}
-          key={i}
+          key={item.id}
         />
         )}
       </List>
