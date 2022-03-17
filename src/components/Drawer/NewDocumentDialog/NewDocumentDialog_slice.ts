@@ -16,6 +16,6 @@ export const newDocumentSlice = createSlice({ // Slice copntains reducers and ac
 
 export const { setCreatingDocument } = newDocumentSlice.actions;
 
-export const component1Reducer = combineReducers({
+export const newDocumentDialogReducer = combineReducers({
   newDocument: newDocumentSlice.reducer,
 });

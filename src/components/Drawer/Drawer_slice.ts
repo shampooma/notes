@@ -1,7 +1,7 @@
 import { DBDocumentStoreItem } from "database/db";
 import { createSlice, combineReducers, PayloadAction } from '@reduxjs/toolkit';
 import { editDrawerArraySlice } from "components/Drawer/EditDocumentArray/EditDocumentArray_slice";
-import { newDocumentSlice } from "components/Drawer/NewDocument/NewDocument_slice";
+import { newDocumentSlice } from "components/Drawer/NewDocumentDialog/NewDocumentDialog_slice";
 
 
 export const DrawerSlice = createSlice({

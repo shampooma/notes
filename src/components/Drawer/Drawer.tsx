@@ -18,8 +18,8 @@ import DocumentItem from "components/Drawer/DocumentItem/DocumentItem";
 import { setEditingDocumentArray } from 'components/Drawer/EditDocumentArray/EditDocumentArray_slice';
 import EditDrawerArray from 'components/Drawer/EditDocumentArray/EditDocumentArray';
 import { db } from "database/db";
-import { setCreatingDocument } from 'components/Drawer/NewDocument/NewDocument_slice';
-import NewDocument from "components/Drawer/NewDocument/NewDocument";
+import { setCreatingDocument } from 'components/Drawer/NewDocumentDialog/NewDocumentDialog_slice';
+import NewDocumentDialog from "components/Drawer/NewDocumentDialog/NewDocumentDialog";
 
 const SwipeableTemporaryDrawer = () => {
   // ____ _    ____ ___  ____ _       ____ ___ ____ ___ ____
@@ -92,7 +92,7 @@ const SwipeableTemporaryDrawer = () => {
   return (
     <div>
       <EditDrawerArray />
-      <NewDocument />
+      <NewDocumentDialog />
       <React.Fragment key={'left'}>
         <IconButton
           onClick={toggleDrawer(true)}

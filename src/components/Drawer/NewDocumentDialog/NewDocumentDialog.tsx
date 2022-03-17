@@ -7,7 +7,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Box from "@mui/material/Box";
-import { setCreatingDocument } from "components/Drawer/NewDocument/NewDocument_slice";
+import { setCreatingDocument } from "components/Drawer/NewDocumentDialog/NewDocumentDialog_slice";
 import { pushLoading, deleteLoading } from "components/Loading/Loading_slice";
 import { LoadingString } from 'components/Loading/Loading_type';
 import ImageList from '@mui/material/ImageList';
@@ -22,7 +22,7 @@ import CardActionArea from '@mui/material/CardActionArea';
 import { setDrawerArray } from 'components/Drawer/Drawer_slice';
 
 
-const documentList = [
+const documentArray = [
   {
     icon: ShowChartIcon,
     title: 'Stock Record',
@@ -33,7 +33,7 @@ const documentList = [
   }
 ]
 
-const NewDocument = () => {
+const NewDocumentDialog = () => {
   // ____ _    ____ ___  ____ _       ____ ___ ____ ___ ____
   // | __ |    |  | |__] |__| |       [__   |  |__|  |  |___
   // |__] |___ |__| |__] |  | |___    ___]  |  |  |  |  |___
@@ -101,6 +101,7 @@ const NewDocument = () => {
       const documents = await db.documentStore.toArray();
 
       dispatch(setDrawerArray(documents));
+      dispatch(setCreatingDocument(false));
     } catch (e) {
       console.log(e);
     } finally {
@@ -114,40 +115,52 @@ const NewDocument = () => {
   return (<Dialog
     open={creatingDocument}
     onClose={closeDialog}
+    fullWidth
+    maxWidth="sm"
   >
     <DialogTitle>
       {"Create new document"}
     </DialogTitle>
-    <DialogContent>
-      <ImageList sx={{ width: 500, height: 450 }}>
-        {documentList.map((item, i) => (
-          <ImageListItem key={i}>
-            <Card sx={{ maxWidth: 345 }}>
-              <CardActionArea
-                style={{backgroundColor: documentType==i ? "#efe" : "#fff"}}
-                onClick={() => documentCardOnClick(i)}
-              >
-                <CardMedia>
-                  <Box
-                    display="flex"
-                    width="100%"
-                    justifyContent="center"
-                  >
-                    <item.icon style={{ fontSize: 100 }} />
-                  </Box>
-                </CardMedia>
-                <CardContent>
-                  <ImageListItemBar
-                    align="center"
-                    title={item.title}
-                    position="below"
-                  />
-                </CardContent>
-              </CardActionArea>
-            </Card>
-          </ImageListItem>
+    <DialogContent
+
+    >
+      <Box
+        display="flex"
+        justifyContent="center"
+      >
+        {documentArray.map((item, i) => (
+          <Card
+            key={i}
+            style={{
+              width: "300px",
+              margin: "10px",
+              display: 'inline-block'
+            }}
+          >
+            <CardActionArea
+              style={{ backgroundColor: documentType == i ? "#efe" : "#fff" }}
+              onClick={() => documentCardOnClick(i)}
+            >
+              <CardMedia>
+                <Box
+                  display="flex"
+                  // width="100%"
+                  justifyContent="center"
+                >
+                  <item.icon style={{ fontSize: 100 }} />
+                </Box>
+              </CardMedia>
+              <CardContent>
+                <ImageListItemBar
+                  align="center"
+                  title={item.title}
+                  position="below"
+                />
+              </CardContent>
+            </CardActionArea>
+          </Card>
         ))}
-      </ImageList>
+      </Box>
     </DialogContent>
     <DialogActions>
       <Box
@@ -163,4 +176,4 @@ const NewDocument = () => {
   </Dialog>);
 }
 
-export default NewDocument;
+export default NewDocumentDialog;
