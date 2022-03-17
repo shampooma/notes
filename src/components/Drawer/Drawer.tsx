@@ -21,6 +21,7 @@ import { db } from "database/db";
 import { setCreatingDocument } from 'components/Drawer/NewDocumentDialog/NewDocumentDialog_slice';
 import NewDocumentDialog from "components/Drawer/NewDocumentDialog/NewDocumentDialog";
 
+// test
 const SwipeableTemporaryDrawer = () => {
   // ____ _    ____ ___  ____ _       ____ ___ ____ ___ ____
   // | __ |    |  | |__] |__| |       [__   |  |__|  |  |___
