@@ -9,17 +9,16 @@ import EditDialog from "./EditDialog/EditDialog";
 import { setStockList } from "components/StockList/StockList_slice"
 import CustomListItem from './CustomListItem/CustomListItem';
 import { pushLoading, deleteLoading } from "components/Loading/Loading_slice";
-import { DBStockStoreItemV2, DBStockRecordV2, DBStoreNameV2 } from "indexeddb/type";
-import { useIndexSelector, useIndexDispatch } from "components/index/index_hooks"
+import { useIndexSelector, useIndexDispatch } from "components/index/index_hooks";
+import { db } from "database/db";
 
 const StockList = () => {
   // ____ _    ____ ___  ____ _       ____ ___ ____ ___ ____
   // | __ |    |  | |__] |__| |       [__   |  |__|  |  |___
   // |__] |___ |__| |__] |  | |___    ___]  |  |  |  |  |___
   const dispatch = useIndexDispatch()
-  const { db, stockRecordArray, documentIndex, documentArray } = useIndexSelector((state) => {
+  const { stockRecordArray, documentIndex, documentArray } = useIndexSelector((state) => {
     return {
-      db: state.index.db as IDBDatabase, //Checked in index.tsx
       stockRecordArray: state.stockList.stockList.stockRecordArray,
       documentIndex: state.index.documentIndex,
       documentArray: state.Drawer.drawer.documentArray,
@@ -30,57 +29,39 @@ const StockList = () => {
   // |    |  | |    |__| |       [__   |  |__|  |  |___
   // |___ |__| |___ |  | |___    ___]  |  |  |  |  |___
 
-  // _  _ ____ ____    ____ ____ ____ ____ ____ ___
-  // |  | [__  |___    |___ |___ |___ |___ |     |
-  // |__| ___] |___    |___ |    |    |___ |___  |
+  // _  _ ____ ____    _  _ ____ ____ _  _ ____
+  // |  | [__  |___    |__| |  | |  | |_/  [__
+  // |__| ___] |___    |  | |__| |__| | \_ ___]
+  // Get stockRecordArray
   React.useEffect(() => {
     (async () => {
+      dispatch(pushLoading(LoadingString.components_StockList_StockList_getStockRecords));
+
       try {
-        // Get stockRecordArray
-        dispatch(pushLoading(LoadingString.components_StockList_StockList_getStockRecords))
+        const stockRecord = await db.stockRecordStore.get(documentArray[documentIndex].recordId)
 
-        await new Promise((res, rej) => {
-          const request = db.transaction(DBStoreNameV2.stockRecordStore, 'readonly').objectStore(DBStoreNameV2.stockRecordStore).get(documentArray[documentIndex].recordId);
+        if (stockRecord === undefined) return;
 
-          request.onerror = (e) => {
-            rej(e);
-          }
-
-          request.onsuccess = () => {
-            dispatch(setStockList(request.result.stockRecordArray));
-
-            res(0);
-          }
-        })
-
-        dispatch(deleteLoading(LoadingString.components_StockList_StockList_getStockRecords));
+        dispatch(setStockList(stockRecord.stockRecordArray));
       } catch (e) {
         console.log(e);
+      } finally {
         dispatch(deleteLoading(LoadingString.components_StockList_StockList_getStockRecords));
       }
     })()
-  }, [db, documentIndex]);
+  }, [documentIndex]);
 
   // ____ _  _ _  _ ____ ___ _ ____ _  _ ____
   // |___ |  | |\ | |     |  | |  | |\ | [__
   // |    |__| | \| |___  |  | |__| | \| ___]
   const centerAddButtonOnclick = React.useCallback(async () => {
+    dispatch(pushLoading(LoadingString.components_StockList_StockList_add));
+
     try {
-      dispatch(pushLoading(LoadingString.components_StockList_StockList_add));
-
       // Read stockStoreItem
-      const stockStoreItem = await new Promise<DBStockStoreItemV2>((res, rej) => {
-        const request = db.transaction(DBStoreNameV2.stockRecordStore, 'readonly').objectStore(DBStoreNameV2.stockRecordStore).get(documentArray[documentIndex].recordId);
+      let stockRecord = await db.stockRecordStore.get(documentArray[documentIndex].recordId);
 
-        request.onerror = (e) => {
-          console.log(e);
-          rej(e);
-        }
-
-        request.onsuccess = () => {
-          res(request.result);
-        }
-      });
+      if (stockRecord === undefined) return;
 
       // Push stockRecordArray of stockStoreItem
       const newStockItem = {
@@ -89,44 +70,22 @@ const StockList = () => {
         price: 0,
       }
 
-      stockStoreItem.stockRecordArray.push(newStockItem);
+      stockRecord.stockRecordArray.push(newStockItem);
 
-      await new Promise((res, rej) => {
-        const request = db.transaction(DBStoreNameV2.stockRecordStore, 'readwrite').objectStore(DBStoreNameV2.stockRecordStore).put(stockStoreItem);
+      await db.stockRecordStore.put(stockRecord);
 
-        request.onerror = (e) => {
-          console.log(e);
-          rej(e);
-        }
+      // Update stockRecordArray global state
+      stockRecord = await db.stockRecordStore.get(documentArray[documentIndex].recordId);
 
-        request.onsuccess = () => {
-          res(0);
-        }
-      });
+      if (stockRecord === undefined) return;
 
-      // Read stockStoreItem
-      await new Promise((res, rej) => {
-        const request = db.transaction(DBStoreNameV2.stockRecordStore, 'readonly').objectStore(DBStoreNameV2.stockRecordStore).get(documentArray[documentIndex].recordId);
-
-        request.onerror = (e) => {
-          console.log(e);
-          rej(e);
-        }
-
-        request.onsuccess = () => {
-          dispatch(setStockList(request.result.stockRecordArray));
-
-          res(0);
-        }
-      });
-
-      // End
-      dispatch(deleteLoading(LoadingString.components_StockList_StockList_add))
+      dispatch(setStockList(stockRecord.stockRecordArray));
     } catch (e) {
       console.log(e);
+    } finally {
       dispatch(deleteLoading(LoadingString.components_StockList_StockList_add))
     }
-  }, [db]);
+  }, [documentArray, documentIndex]);
 
   return (
     <main>

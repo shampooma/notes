@@ -4,19 +4,19 @@
 
 <h1 align="center">Notes</h1>
 
-[0. Quick start](../README.md)
+[Quick start](../README.md)
 
-[1. Development](./development.md)
+[Development](./development.md)
 
-<span>2. Deployment</span>
+<span>Deployment</span>
 
 ---
 
-<h1 id="2.">2. Deployment</h1>
+<h1>Deployment</h1>
 
-<h2>2.0. Procedures</h2>
+<h2>0. Procedures</h2>
 
-<h3>2.0.0. Get the site ready</h3>
+<h3>0.0. Get the site ready</h3>
 
 - Option 0: use docker
 
@@ -38,7 +38,7 @@
   cp -r ./public/* ./docs/
   ```
 
-<h3>2.0.1. Push to GitHub</h3>
+<h3>0.1. Push to GitHub</h3>
 
 ```sh
 git pull origin dev
@@ -47,15 +47,15 @@ git commit -m "new commit"
 git push origin dev
 ```
 
-<h3>2.0.2. Create pull request</h3>
+<h3>0.2. Create pull request</h3>
 
-<h2>2.1. Hints</h2>
-<h3>2.1.0. Path prefix</h3>
+<h2>1. Hints</h2>
+<h3>1.0. Path prefix</h3>
 
 When push to GitHub the website is in the path /notes, navigation in the app could achieved by:
-- Setting `pathPrefix: '/notes'` in `gatsby-config.js`, 
+- Setting `pathPrefix: '/notes'` in `gatsby-config.js`,
 - Use `--prefix-paths` for `build` and `serve`
 
-<h3>2.1.1. GitHub page building source</h3>
+<h3>1.1. GitHub page building source</h3>
 
 GitHub page is built from the `/docs` folder in the `main` branch

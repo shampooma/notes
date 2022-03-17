@@ -21,8 +21,8 @@ import {
   setShowEditDialog,
 } from "components/StockList/EditDialog/EditDialog_slice";
 import { LoadingString } from "components/Loading/Loading_type";
-import { DBStockStoreItemV2, DBStoreNameV2 } from "indexeddb/type";
 import { setStockList } from "../StockList_slice";
+import { db } from "database/db";
 
 const CustomListItem = ({
   index,
@@ -33,16 +33,13 @@ const CustomListItem = ({
   // | __ |    |  | |__] |__| |       [__   |  |__|  |  |___
   // |__] |___ |__| |__] |  | |___    ___]  |  |  |  |  |___
   const dispatch = useIndexDispatch();
-  const { db, stockRecordArray, documentIndex, documentArray } = useIndexSelector((state) => {
+  const { stockRecordArray, documentIndex, documentArray } = useIndexSelector((state) => {
     return {
-      db: state.index.db as IDBDatabase, //Checked in index.tsx
       stockRecordArray: state.stockList.stockList.stockRecordArray,
       documentIndex: state.index.documentIndex,
       documentArray: state.Drawer.drawer.documentArray,
     }
   });
-
-  if (db === null) return <></>;
 
   // _    ____ ____ ____ _       ____ ___ ____ ___ ____
   // |    |  | |    |__| |       [__   |  |__|  |  |___
@@ -50,9 +47,9 @@ const CustomListItem = ({
   const [showDeleteWarning, setShowDeleteWarning] = React.useState(false);
 
 
-  // _  _ ____ ____    ____ ____ ____ ____ ____ ___
-  // |  | [__  |___    |___ |___ |___ |___ |     |
-  // |__| ___] |___    |___ |    |    |___ |___  |
+  // _  _ ____ ____    _  _ ____ ____ _  _ ____
+  // |  | [__  |___    |__| |  | |  | |_/  [__
+  // |__| ___] |___    |  | |__| |__| | \_ ___]
 
   // ____ _  _ _  _ ____ ___ _ ____ _  _ ____
   // |___ |  | |\ | |     |  | |  | |\ | [__
@@ -61,55 +58,26 @@ const CustomListItem = ({
     try {
       dispatch(pushLoading(LoadingString.components_StockList_CustomListItem_deleteItem));
 
-      // Read stockStoreItem
-      const stockStoreItem = await new Promise<DBStockStoreItemV2>((res, rej) => {
-        const request = db.transaction(DBStoreNameV2.stockRecordStore, 'readwrite').objectStore(DBStoreNameV2.stockRecordStore).get(documentArray[documentIndex].recordId);
+      // Read stockRecord
+      let stockRecord = await db.stockRecordStore.get(documentArray[documentIndex].recordId);
 
-        request.onerror = (e) => {
-          console.log(e);
-          rej(e);
-        }
-
-        request.onsuccess = () => {
-          res(request.result);
-        }
-      });
+      if (stockRecord === undefined) return;
 
       // Delete stockRecord
-      stockStoreItem.stockRecordArray.splice(index, 1);
+      stockRecord.stockRecordArray.splice(index, 1);
 
-      await new Promise((res, rej) => {
-        const request = db.transaction(DBStoreNameV2.stockRecordStore, 'readwrite').objectStore(DBStoreNameV2.stockRecordStore).put(stockStoreItem);
+      await db.stockRecordStore.put(stockRecord);
 
-        request.onerror = (e) => {
-          console.log(e);
-          rej(e);
-        }
+      // Read stockRecord
+      stockRecord = await db.stockRecordStore.get(documentArray[documentIndex].recordId);
 
-        request.onsuccess = () => {
-          res(0);
-        }
-      });
+      if (stockRecord === undefined) return;
 
-      // Read stockStoreItem
-      await new Promise((res, rej) => {
-        const request = db.transaction(DBStoreNameV2.stockRecordStore, 'readwrite').objectStore(DBStoreNameV2.stockRecordStore).get(documentArray[documentIndex].recordId);
-
-        request.onerror = (e) => {
-          console.log(e);
-          rej(e);
-        }
-
-        request.onsuccess = () => {
-          dispatch(setStockList(request.result.stockRecordArray))
-          res(0);
-        }
-      });
-
+      setShowDeleteWarning(false);
+      dispatch(setStockList(stockRecordArray))
     } catch (e) {
       console.log(e);
     } finally {
-      setShowDeleteWarning(false);
       dispatch(deleteLoading(LoadingString.components_StockList_CustomListItem_deleteItem));
     }
   }, [documentArray, documentIndex]);
@@ -118,11 +86,10 @@ const CustomListItem = ({
     setShowDeleteWarning(true);
   }, []);
 
-  const customListItemButtonOnclick = () => {
+  const customListItemButtonOnclick = React.useCallback(() => {
     dispatch(setEditDialogIndex(index));
     dispatch(setShowEditDialog(true));
-  }
-
+  }, []);
 
   return (<>
     <Dialog
@@ -131,17 +98,17 @@ const CustomListItem = ({
     >
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
-          Confirm to delete stock Item ?
+          Confirm to delete {stockRecordArray[index].name}?
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Box 
+        <Box
           display="flex"
           justifyContent="center"
           style={{
             width: "100%"
           }}
-          >
+        >
           <Button onClick={deleteWarningConfirmOnclick} color="error">
             Confirm
           </Button>

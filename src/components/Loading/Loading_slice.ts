@@ -12,10 +12,7 @@ export const LoadingSlice = createSlice({
       state.loading.push(action.payload);
     },
     deleteLoading: (state, action: PayloadAction<number>) => {
-      const index = state.loading.indexOf(action.payload);
-      if (index > -1) {
-        state.loading.splice(index, 1);
-      }
+      state.loading = state.loading.filter(s => s !== action.payload);
     },
   },
 });

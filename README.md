@@ -4,29 +4,28 @@
 
 <h1 align="center">Notes</h1>
 
-<span>0. Quick start</span>
+<span>Quick start</span>
 
-[1. Development](./readme/development.md)
+[Development](./readme/development.md)
 
-[2. Deployment](./readme/deployment.md)
+[Deployment](./readme/deployment.md)
 
 ---
 
-<h1 id="0.">0. Quick start</h1>
+<h1 id="Quick start">Quick start</h1>
 
-<h2>0.1. Get the site ready</h2>
+<h2>0. Get the site ready</h2>
 
 - Option 0: visit GitHub page
 
-  <a href=https://shampooma.github.io/notes/>https://shampooma.github.io/notes/</a>
+  <a href="https://shampooma.github.io/notes/">https://shampooma.github.io/notes/</a>
 
 - Option 1: Host the website by docker
-
-  Set `PROCESS_MODE=prod` in `.env`
 
   ```bash
   git clone -b main https://github.com/shampooma/notes.git
   cd notes
+  sed -i 's/PROCESS_MODE=.*/PROCESS_MODE=prod/' .env
   ./start.sh build
   ./start.sh up -d
   ```
@@ -45,6 +44,6 @@
 
   visit: <a href=http://localhost:9000>http://localhost:9000</a>
 
-<h2>0.1. Install on mobile phone</h2>
+<h2>1. Install on mobile phone</h2>
 
 Find a way for `Add to home screen`

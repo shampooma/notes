@@ -3,6 +3,7 @@ import { indexReducer } from "components/index/index_slice";
 import { stockListReducer } from "components/StockList/StockList_slice";
 import { DrawerReducer } from "components/Drawer/Drawer_slice";
 import { LoadingReducer } from "components/Loading/Loading_slice";
+import { PasswordReducer } from "components/Password/Password_slice";
 
 const configureStoreArgument = {
   reducer: {
@@ -10,6 +11,7 @@ const configureStoreArgument = {
     stockList: stockListReducer,
     Drawer: DrawerReducer,
     Loading: LoadingReducer,
+    Password: PasswordReducer,
   },
   // type of getDefaultMiddleware any as I don't know how to set
   middleware: (getDefaultMiddleware: any) => getDefaultMiddleware({
