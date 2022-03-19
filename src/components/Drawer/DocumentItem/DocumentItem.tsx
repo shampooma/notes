@@ -80,7 +80,7 @@ const DocumentItem = ({
     dispatch(pushLoading(LoadingString.components_Drawer_DocumentItem_deleteDocument));
 
     try {
-      await db.documentStore.delete(documentArray[i].id);
+      await db.documentStore.delete(documentArray[i].id as number);
 
       const documents = await db.documentStore.toArray();
 

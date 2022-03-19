@@ -1,6 +1,6 @@
 import * as React from "react"
 import { useIndexSelector, useIndexDispatch } from "components/index/index_hooks"; // Import hooks for redux, just added typing for useSelector and useDispatch
-import { db, DBPasswordItemStoreItem } from "database/db";
+import { db, DBPasswordRecord } from "database/db";
 import { useLiveQuery } from "dexie-react-hooks";
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
@@ -33,11 +33,11 @@ const Password = () => {
   // _  _ ____ ____    _  _ ____ ____ _  _ ____
   // |  | [__  |___    |__| |  | |  | |_/  [__
   // |__| ___] |___    |  | |__| |__| | \_ ___]
-  const passwordArray = useLiveQuery<DBPasswordItemStoreItem[]>(
+  const passwordArray = useLiveQuery<DBPasswordRecord[]>(
     () => {
-      return db.passwordItemStore
-        .where('passwordMetaDataStoreId')
-        .equals(documentArray[documentIndex].recordId)
+      return db.passwordRecordStore
+        .where('documentId')
+        .equals(documentArray[documentIndex].id as number)
         .toArray()
     },
     [documentIndex, documentArray,]
@@ -52,13 +52,13 @@ const Password = () => {
     try {
       // Push stockRecordArray of stockStoreItem
       const newPasswordItem = {
-        passwordMetaDataStoreId: documentArray[documentIndex].recordId,
+        documentId: documentArray[documentIndex].id as number,
         description: "description",
         name: "name",
         password: "password",
       }
 
-      await db.passwordItemStore.put(newPasswordItem);
+      await db.passwordRecordStore.put(newPasswordItem);
     } catch (e) {
       console.log(e);
     } finally {

@@ -1,6 +1,6 @@
 import * as React from "react"
 import { useIndexSelector, useIndexDispatch } from "components/index/index_hooks"; // Import hooks for redux, just added typing for useSelector and useDispatch
-import { db, DBPasswordItemStoreItem } from "database/db";
+import { db } from "database/db";
 import { useLiveQuery } from "dexie-react-hooks";
 import { LoadingString } from "components/Loading/Loading_type";
 import { pushLoading, deleteLoading } from "components/Loading/Loading_slice";
@@ -36,7 +36,7 @@ const EditDialog = () => {
   // |__| ___] |___    |  | |__| |__| | \_ ___]
   React.useEffect(() => {
     (async () => {
-      const passwordItem = await db.passwordItemStore.get(editingId);
+      const passwordItem = await db.passwordRecordStore.get(editingId);
 
       if (passwordItem === undefined) {
         return;
@@ -53,7 +53,7 @@ const EditDialog = () => {
   // |___ |  | |\ | |     |  | |  | |\ | [__
   // |    |__| | \| |___  |  | |__| | \| ___]
   const updateButtonOnclick = React.useCallback(() => {
-    db.passwordItemStore.update(editingId, {
+    db.passwordRecordStore.update(editingId, {
       description: description,
       name: name,
       password: password,

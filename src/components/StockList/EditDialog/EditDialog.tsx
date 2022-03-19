@@ -30,14 +30,14 @@ const EditDialog = () => {
   const dispatch = useIndexDispatch()
   const {
     showEditDialog,
-    editDialogIndex,
+    editDialogId,
     documentIndex,
     documentArray,
     stockRecordArray,
   } = useIndexSelector((state) => {
     return {
       showEditDialog: state.stockList.editDialog.showDialog,
-      editDialogIndex: state.stockList.editDialog.index,
+      editDialogId: state.stockList.editDialog.id,
       documentIndex: state.index.documentIndex,
       documentArray: state.Drawer.drawer.documentArray,
       stockRecordArray: state.stockList.stockList.stockRecordArray,
@@ -58,12 +58,20 @@ const EditDialog = () => {
   // |  | [__  |___    |__| |  | |  | |_/  [__
   // |__| ___] |___    |  | |__| |__| | \_ ___]
   React.useEffect(() => {
-    if (editDialogIndex > -1 && showEditDialog) {
-      setDeletePosition("0");
-      setAddPrice("0");
-      setAddPosition("0");
-      setUpdateName(stockRecordArray[editDialogIndex]["name"]);
-    }
+    (async () => {
+      if (editDialogId > -1 && showEditDialog) {
+        const stockRecord = await db.stockRecordStore.get(editDialogId);
+
+        if (stockRecord === undefined) {
+          return;
+        }
+
+        setDeletePosition("0");
+        setAddPrice("0");
+        setAddPosition("0");
+        setUpdateName(stockRecord["name"]);
+      }
+    })()
   }, [showEditDialog]);
 
   // ____ _  _ _  _ ____ ___ _ ____ _  _ ____
@@ -78,24 +86,29 @@ const EditDialog = () => {
       }
 
       // Read stockRecord
-      let stockRecord = await db.stockRecordStore.get(documentArray[documentIndex].recordId);
+      let stockRecord = await db.stockRecordStore.get(editDialogId);
 
       if (stockRecord === undefined) return;
 
-      // Put stockRecord
-      const { price: oldPrice, position: oldPosition } = stockRecord.stockRecordArray[editDialogIndex];
+      // Update stockRecord
+      const { price: oldPrice, position: oldPosition } = stockRecord;
 
-      stockRecord.stockRecordArray[editDialogIndex]["price"] = (oldPrice * oldPosition + Number(addPrice) * Number(addPosition)) / (oldPosition + Number(addPosition));
-      stockRecord.stockRecordArray[editDialogIndex]["position"] = (oldPosition + Number(addPosition))
+      const updateValues = {
+        price: (oldPrice * oldPosition + Number(addPrice) * Number(addPosition)) / (oldPosition + Number(addPosition)),
+        position: (oldPosition + Number(addPosition))
+      }
 
-      await db.stockRecordStore.put(stockRecord);
+      await db.stockRecordStore.update(stockRecord.id as number, updateValues);
 
       // Read stockArray
-      stockRecord = await db.stockRecordStore.get(documentArray[documentIndex].recordId);
+      const stockRecordArray = await db.stockRecordStore
+        .where("documentId")
+        .equals(documentArray[documentIndex].id as number)
+        .toArray();
 
-      if (stockRecord === undefined) return;
+      if (stockRecordArray === undefined) return;
 
-      dispatch(setStockList(stockRecord.stockRecordArray));
+      dispatch(setStockList(stockRecordArray));
     } catch (e) {
       console.log(e);
     } finally {
@@ -104,7 +117,7 @@ const EditDialog = () => {
   }, [
     addPosition,
     addPrice,
-    editDialogIndex,
+    editDialogId,
     documentIndex,
     documentArray,
   ]);
@@ -114,27 +127,40 @@ const EditDialog = () => {
       dispatch(pushLoading(LoadingString.components_StockList_EditDialog_deleteStock))
 
       // Read stockRecord
-      let stockRecord = await db.stockRecordStore.get(documentArray[documentIndex].recordId);
+      const stockRecord = await db.stockRecordStore.get(editDialogId);
 
       if (stockRecord === undefined) return;
 
       // Delete stock
-      stockRecord.stockRecordArray[editDialogIndex].position -= Number(deletePosition);
+      const updateValues = {} as {
+        price: number,
+        position: number,
+      }
 
-      const request = db.stockRecordStore.put(stockRecord);
+      if (stockRecord.position - Number(deletePosition) <= 0) {
+        updateValues.price = 0;
+        updateValues.position = 0;
+      } else {
+        updateValues.position = stockRecord.position - Number(deletePosition)
+      }
+
+      await db.stockRecordStore.update(editDialogId, updateValues);
 
       // Read stockRecordArray
-      stockRecord = await db.stockRecordStore.get(documentArray[documentIndex].recordId);
+      const stockRecordArray = await db.stockRecordStore
+        .where("documentId")
+        .equals(documentArray[documentIndex].id as number)
+        .toArray();
 
-      if (stockRecord === undefined) return;
+      if (stockRecordArray === undefined) return;
 
-      dispatch(setStockList(stockRecord.stockRecordArray));
+      dispatch(setStockList(stockRecordArray));
     } catch (e) {
       console.log(e);
     } finally {
       dispatch(deleteLoading(LoadingString.components_StockList_EditDialog_deleteStock))
     }
-  }, [deletePosition, editDialogIndex]);
+  }, [deletePosition, editDialogId]);
 
   const closeDialog = React.useCallback(() => {
     dispatch(setShowEditDialog(false));
@@ -149,29 +175,29 @@ const EditDialog = () => {
     try {
       dispatch(pushLoading(LoadingString.components_StockList_EditDialog_update))
 
-      // Read stockRecord
-      let stockRecord = await db.stockRecordStore.get(documentArray[documentIndex].recordId);
-
-      if (stockRecord === undefined) return;
-
       // Update stock
-      stockRecord.stockRecordArray[editDialogIndex].name = updateName
+      const updateValues = {
+        name: updateName
+      }
 
-      const request = db.stockRecordStore.put(stockRecord);
+      await db.stockRecordStore.update(editDialogId, updateValues);
 
       // Read stockRecordArray
-      stockRecord = await db.stockRecordStore.get(documentArray[documentIndex].recordId);
+      const stockRecordArray = await db.stockRecordStore
+        .where("documentId")
+        .equals(documentArray[documentIndex].id as number)
+        .toArray();
 
-      if (stockRecord === undefined) return;
+      if (stockRecordArray === undefined) return;
 
       setEditingName(false);
-      dispatch(setStockList(stockRecord.stockRecordArray));
+      dispatch(setStockList(stockRecordArray));
     } catch (e) {
       console.log(e);
     } finally {
       dispatch(deleteLoading(LoadingString.components_StockList_EditDialog_update))
     }
-  }, [editDialogIndex, updateName, documentIndex]);
+  }, [editDialogId, updateName, documentIndex]);
 
   // ____ ____ ___ _  _ ____ _  _
   // |__/ |___  |  |  | |__/ |\ |

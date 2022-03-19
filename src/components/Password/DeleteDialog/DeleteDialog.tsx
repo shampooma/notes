@@ -1,6 +1,6 @@
 import * as React from "react"
 import { useIndexSelector, useIndexDispatch } from "components/index/index_hooks"; // Import hooks for redux, just added typing for useSelector and useDispatch
-import { db, DBPasswordItemStoreItem } from "database/db";
+import { db, DBPasswordRecord } from "database/db";
 import { useLiveQuery } from "dexie-react-hooks";
 import { LoadingString } from "components/Loading/Loading_type";
 import { pushLoading, deleteLoading } from "components/Loading/Loading_slice";
@@ -36,15 +36,14 @@ const DeleteDialog = () => {
   // ____ _  _ _  _ ____ ___ _ ____ _  _ ____
   // |___ |  | |\ | |     |  | |  | |\ | [__
   // |    |__| | \| |___  |  | |__| | \| ___]
-  const passwordItem = useLiveQuery<DBPasswordItemStoreItem>(
-    () => db.passwordItemStore.get(deletingId),
+  const passwordItem = useLiveQuery(
+    () => db.passwordRecordStore.get(deletingId),
     [deletingId]
   );
 
   const confirmOnClick = React.useCallback(() => {
     (async () => {
-      console.log(deletingId)
-      await db.passwordItemStore.delete(deletingId)
+      await db.passwordRecordStore.delete(deletingId)
       dispatch(setIsDeleting(false))
     })()
   }, [deletingId])

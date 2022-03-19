@@ -75,8 +75,6 @@ const NewDocumentDialog = () => {
     try {
       dispatch(pushLoading(LoadingString.components_Drawer_Drawer_addDocument));
 
-      let recordId;
-
       switch (documentType) {
         case DBDocumentTypeEnum.stock:
           const newStockRecord = {
@@ -84,20 +82,14 @@ const NewDocumentDialog = () => {
           }
 
           // Add new stockRecord
-          recordId = await db.stockRecordStore.add(newStockRecord) as number;
+          await db.stockRecordStore.add(newStockRecord);
           break;
         case DBDocumentTypeEnum.password:
-          const newPasswordMetaData = {
-          }
-
-          // Add new passwordMetaData
-          recordId = await db.passwordMetaDataStore.add(newPasswordMetaData) as number;
           break;
       }
 
       const newDocument = {
         name: documentName,
-        recordId: recordId,
         type: documentType,
       }
 
