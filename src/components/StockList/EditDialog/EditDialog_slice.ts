@@ -3,15 +3,15 @@ import { createSlice } from '@reduxjs/toolkit'
 export const editDialogSlice = createSlice({
   name: "EditDialog",
   initialState: {
-    index: -1,
+    id: -1,
     showDialog: false
   } as {
-    index: number,
+    id: number,
     showDialog: boolean,
   },
   reducers: {
-    setEditDialogIndex: (state, action) => {
-      state.index = action.payload;
+    setEditDialogId: (state, action) => {
+      state.id = action.payload;
     },
     setShowEditDialog: (state, action) => {
       state.showDialog = action.payload;
@@ -20,7 +20,7 @@ export const editDialogSlice = createSlice({
 })
 
 export const {
-  setEditDialogIndex,
+  setEditDialogId,
   setShowEditDialog
 } = editDialogSlice.actions
 

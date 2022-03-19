@@ -50,7 +50,7 @@ const EditDrawerArray = () => {
 
     try {
       // Update
-      await db.documentStore.update(documentArray[editDrawerArrayIndex].id, {
+      await db.documentStore.update(documentArray[editDrawerArrayIndex].id as number, {
         "name": editingDocumentItemName
       });
 

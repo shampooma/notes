@@ -1,8 +1,6 @@
 import * as React from "react"
-import { useIndexSelector, useIndexDispatch } from "components/index/index_hooks"; // Import hooks for redux, just added typing for useSelector and useDispatch
-import { db, DBPasswordItemStoreItem } from "database/db";
-import { LoadingString } from "components/Loading/Loading_type";
-import { pushLoading, deleteLoading } from "components/Loading/Loading_slice";
+import { useIndexDispatch } from "components/index/index_hooks"; // Import hooks for redux, just added typing for useSelector and useDispatch
+import { DBPasswordRecord } from "database/db";
 import { setIsEditing, setEditingId } from "components/Password/EditDialog/EditDialog_slice";
 import { setIsDeleting, setDeletingId } from "components/Password/DeleteDialog/DeleteDialog_slice";
 import EditIcon from '@mui/icons-material/Edit';
@@ -13,7 +11,7 @@ import Box from '@mui/material/Box';
 const Item = ({ // Define parameters and corresponding data type
   item
 }: {
-  item: DBPasswordItemStoreItem
+  item: DBPasswordRecord
 }) => {
   // ____ _    ____ ___  ____ _       ____ ___ ____ ___ ____
   // | __ |    |  | |__] |__| |       [__   |  |__|  |  |___

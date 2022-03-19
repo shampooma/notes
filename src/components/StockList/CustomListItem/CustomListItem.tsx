@@ -17,17 +17,17 @@ import Box from "@mui/material/Box";
 import { deleteLoading, pushLoading } from "components/Loading/Loading_slice";
 import { useIndexSelector, useIndexDispatch } from "components/index/index_hooks";
 import {
-  setEditDialogIndex,
+  setEditDialogId,
   setShowEditDialog,
 } from "components/StockList/EditDialog/EditDialog_slice";
 import { LoadingString } from "components/Loading/Loading_type";
 import { setStockList } from "../StockList_slice";
-import { db } from "database/db";
+import { db, DBStockRecord } from "database/db";
 
 const CustomListItem = ({
-  index,
+  stockRecord,
 }: {
-  index: number,
+  stockRecord: DBStockRecord,
 }) => {
   // ____ _    ____ ___  ____ _       ____ ___ ____ ___ ____
   // | __ |    |  | |__] |__| |       [__   |  |__|  |  |___
@@ -58,20 +58,15 @@ const CustomListItem = ({
     try {
       dispatch(pushLoading(LoadingString.components_StockList_CustomListItem_deleteItem));
 
-      // Read stockRecord
-      let stockRecord = await db.stockRecordStore.get(documentArray[documentIndex].recordId);
-
-      if (stockRecord === undefined) return;
-
-      // Delete stockRecord
-      stockRecord.stockRecordArray.splice(index, 1);
-
-      await db.stockRecordStore.put(stockRecord);
+      await db.stockRecordStore.delete(stockRecord.id as number);
 
       // Read stockRecord
-      stockRecord = await db.stockRecordStore.get(documentArray[documentIndex].recordId);
+      const stockRecordArray = await db.stockRecordStore
+        .where("documentId")
+        .equals(documentArray[documentIndex].id as number)
+        .toArray();
 
-      if (stockRecord === undefined) return;
+      if (stockRecordArray === undefined) return;
 
       setShowDeleteWarning(false);
       dispatch(setStockList(stockRecordArray))
@@ -87,7 +82,7 @@ const CustomListItem = ({
   }, []);
 
   const customListItemButtonOnclick = React.useCallback(() => {
-    dispatch(setEditDialogIndex(index));
+    dispatch(setEditDialogId(stockRecord.id));
     dispatch(setShowEditDialog(true));
   }, []);
 
@@ -98,7 +93,7 @@ const CustomListItem = ({
     >
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
-          Confirm to delete {stockRecordArray[index].name}?
+          Confirm to delete {stockRecord.name}?
         </DialogContentText>
       </DialogContent>
       <DialogActions>
@@ -136,8 +131,8 @@ const CustomListItem = ({
           </Avatar>
         </ListItemAvatar>
         <ListItemText
-          primary={stockRecordArray[index]['name']}
-          secondary={`Price: ${stockRecordArray[index]['price']} | Position: ${stockRecordArray[index]['position']}`}
+          primary={stockRecord['name']}
+          secondary={`Price: ${stockRecord['price']} | Position: ${stockRecord['position']}`}
         />
       </ListItemButton>
     </ListItem>

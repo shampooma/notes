@@ -38,11 +38,14 @@ const StockList = () => {
       dispatch(pushLoading(LoadingString.components_StockList_StockList_getStockRecords));
 
       try {
-        const stockRecord = await db.stockRecordStore.get(documentArray[documentIndex].recordId)
+        const stockRecordArray = await db.stockRecordStore
+          .where("documentId")
+          .equals(documentArray[documentIndex].id as number)
+          .toArray();
 
-        if (stockRecord === undefined) return;
+        if (stockRecordArray === undefined) return;
 
-        dispatch(setStockList(stockRecord.stockRecordArray));
+        dispatch(setStockList(stockRecordArray));
       } catch (e) {
         console.log(e);
       } finally {
@@ -58,28 +61,25 @@ const StockList = () => {
     dispatch(pushLoading(LoadingString.components_StockList_StockList_add));
 
     try {
-      // Read stockStoreItem
-      let stockRecord = await db.stockRecordStore.get(documentArray[documentIndex].recordId);
-
-      if (stockRecord === undefined) return;
-
       // Push stockRecordArray of stockStoreItem
-      const newStockItem = {
+      const newStockRecord = {
+        documentId: documentArray[documentIndex].id as number,
         name: "newStock",
         position: 0,
         price: 0,
       }
 
-      stockRecord.stockRecordArray.push(newStockItem);
-
-      await db.stockRecordStore.put(stockRecord);
+      await db.stockRecordStore.add(newStockRecord);
 
       // Update stockRecordArray global state
-      stockRecord = await db.stockRecordStore.get(documentArray[documentIndex].recordId);
+      const stockRecordArray = await db.stockRecordStore
+        .where("documentId")
+        .equals(documentArray[documentIndex].id as number)
+        .toArray();
 
-      if (stockRecord === undefined) return;
+      if (stockRecordArray === undefined) return;
 
-      dispatch(setStockList(stockRecord.stockRecordArray));
+      dispatch(setStockList(stockRecordArray));
     } catch (e) {
       console.log(e);
     } finally {
@@ -93,11 +93,11 @@ const StockList = () => {
       <EditDialog></EditDialog>
 
       <List>
-        {stockRecordArray.map((stockRecord, i) => {
+        {stockRecordArray.map((stockRecord) => {
 
           return (<CustomListItem
-            key={i}
-            index={i}
+            key={stockRecord.id}
+            stockRecord={stockRecord}
           ></CustomListItem>)
         })}
       </List>
