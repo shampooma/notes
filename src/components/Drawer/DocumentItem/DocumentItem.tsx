@@ -28,10 +28,11 @@ const DocumentItem = ({
   // | __ |    |  | |__] |__| |       [__   |  |__|  |  |___
   // |__] |___ |__| |__] |  | |___    ___]  |  |  |  |  |___
   const dispatch = useIndexDispatch();
-  const { editingDocumentArray, documentArray } = useIndexSelector((state) => {
+  const { editingDocumentArray, documentArray, interactingDocumentIndex } = useIndexSelector((state) => {
     return {
       editingDocumentArray: state.Drawer.editDrawerArray.editingDocumentArray,
       documentArray: state.Drawer.drawer.documentArray,
+      interactingDocumentIndex: state.index.documentIndex
     }
   });
 
@@ -123,6 +124,9 @@ const DocumentItem = ({
       <Box
         sx={{ display: 'flex' }}
         key={i}
+        style={{
+          backgroundColor: interactingDocumentIndex === i ? "#efe" : "#fff"
+        }}
       >
 
         <DeleteButtonElement />
