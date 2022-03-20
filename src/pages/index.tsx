@@ -68,7 +68,7 @@ const IndexPage = () => {
               display="flex"
               justifyContent="center"
             >
-              <h1>No document have been selected</h1>
+              <h1>No document have been created</h1>
             </Box> :
             <PageContent />
         }

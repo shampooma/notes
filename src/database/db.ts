@@ -36,7 +36,6 @@ export interface DBDocumentStoreItem {
 //   passwordRecordStore!: Table<DBPasswordRecordItem>;
 //   documentStore!: Table<DBDocumentStoreItem>;
 
-
 //   constructor() {
 //     super('NoteDb');
 //     this.version(1).stores({
@@ -48,7 +47,6 @@ export interface DBDocumentStoreItem {
 // }
 
 // export const db = new NoteDb();
-
 
 export const db = new Dexie("NoteDb");
 

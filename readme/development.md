@@ -28,11 +28,7 @@
 
 [4. Database](#4.)
 
-[5. Convensions](5.)
-
-[6. Install packages](6.)
-
-[7. Bugs](#7.)
+[5. Bugs](#5.)
 
 <h2 id="0.">0. Procedures</h2>
 
@@ -65,31 +61,21 @@ cd notes
 ```bash
 src/
 ├── components/  // For React component that not rendered as pages
+│   ├── index_hooks.ts
+│   ├── index_slice.ts
+│   ├── index_store.ts
+│   ├── Component0_slice.ts
 │   ├── Component0.tsx
 │   └── Component1/
+│       ├── Component1_slice.tsx
 │       ├── Component1.tsx
+│       ├── Component2_slice.tsx
 │       └── Component2.tsx
 ├── images/  // For images
 │   └── image0.png
-├── others/  // For *enum.ts, *slice.ts, *type.ts, \
-│   │               and other remaing things
-│   ├── Component0_enum.ts
-│   ├── Component0_slice.ts
-│   ├── Component0_type.ts
-│   ├── index_hooks.ts
-│   ├── index_store.ts
-│   └── Component1/
-│       ├── Component1_enum.ts
-│       ├── Component1_slice.ts
-│       ├── Component1_type.ts
-│       ├── Component2_enum.ts
-│       ├── Component2_slice.ts
-│       └── Component2_type.ts
-├── pages/  // For pages
-│   ├── 404.tsx
-│   └── index.tsx
-└── styles/  // For styles
-    └── style0.css
+└── pages/  // For pages
+    ├── 404.tsx
+    └── index.tsx
 ```
 
 <h2 id="2.">2. State management</h2>
@@ -221,62 +207,7 @@ export default Component1;
 
 Using Dexie
 
-<h3>4.1. Using APIs</h3>
-
-```ts
-import { DBStoreNameV2} from "indexeddb/type";
-import { pushLoading, deleteLoading } from "components/Loading/Loading_slice";
-import { LoadingString } from 'components/Loading/Loading_type';
-
-dispatch(pushLoading(LoadingString.loading_enum));
-
-try {s
-  const items = await new Promise((res, rej) => {
-    const request = db.transaction(DBStoreNameV2.stockRecordStore, "readonly").objectStore(DBStoreNameV2.stockRecordStore).getAll();
-
-    request.onerror = (e) => {
-      console.log(e);
-      rej(e);
-    }
-
-    request.onsuccess = () => {
-      res(request.result);
-    }
-  });
-} catch (e) {
-  console.log(e);
-} finally {
-  dispatch(deleteLoading(LoadingString.loading_enum))
-}
-```
-
-<h2 id="5.">5. Convensions</h2>
-
-<h3>5.0. Naming</h3>
-
-If the variable not only used in certain area, it should contain prefix that indicate what this variable used for, such as `DBUpgrade`
-
-<h3>5.1. Error handling</h3>
-
-Error should handled within same file
-
-```ts
-const fun = () => {
-  try {
-
-  } catch (e) {
-    console.log(e);
-  }
-}
-```
-
-<h2 id="6.">6. Install packages</h2>
-
-```sh
-docker exec notes_dev_1 npm i package
-```
-
-<h2 id="7.">7. Bugs</h2>
+<h2 id="5.">5. Bugs</h2>
 
 <h3>Bug 0</h3>
 
@@ -287,13 +218,3 @@ When using docker for development, donsole continue output `Cross-Origin Request
 <h4>Solution</h4>
 
 Add environment variable `INTERNAL_STATUS_PORT`, and map the port
-
-<h3>Bug 1</h3>
-
-<h4>Problem</h4>
-
-Redux not recommended to put non-serializable values in state or actions.
-
-<h4>Solution</h4>
-
-Ignore it by setting `ignoredActions` and `ignoredPaths` in `index_store.ts`
