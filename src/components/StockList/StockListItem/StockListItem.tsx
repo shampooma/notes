@@ -21,23 +21,19 @@ import {
   setShowEditDialog,
 } from "components/StockList/EditDialog/EditDialog_slice";
 import { LoadingString } from "components/Loading/Loading_type";
-import { setStockList } from "../StockList_slice";
 import { db, DBStockRecord } from "database/db";
 
-const CustomListItem = ({
-  stockRecord,
+const StockListItem = ({
+  stockRecord
 }: {
-  stockRecord: DBStockRecord,
+  stockRecord: DBStockRecord
 }) => {
   // ____ _    ____ ___  ____ _       ____ ___ ____ ___ ____
   // | __ |    |  | |__] |__| |       [__   |  |__|  |  |___
   // |__] |___ |__| |__] |  | |___    ___]  |  |  |  |  |___
   const dispatch = useIndexDispatch();
-  const { stockRecordArray, documentIndex, documentArray } = useIndexSelector((state) => {
+  const { } = useIndexSelector((state) => {
     return {
-      stockRecordArray: state.stockList.stockList.stockRecordArray,
-      documentIndex: state.index.documentIndex,
-      documentArray: state.Drawer.drawer.documentArray,
     }
   });
 
@@ -45,7 +41,6 @@ const CustomListItem = ({
   // |    |  | |    |__| |       [__   |  |__|  |  |___
   // |___ |__| |___ |  | |___    ___]  |  |  |  |  |___
   const [showDeleteWarning, setShowDeleteWarning] = React.useState(false);
-
 
   // _  _ ____ ____    _  _ ____ ____ _  _ ____
   // |  | [__  |___    |__| |  | |  | |_/  [__
@@ -56,32 +51,27 @@ const CustomListItem = ({
   // |    |__| | \| |___  |  | |__| | \| ___]
   const deleteWarningConfirmOnclick = React.useCallback(async () => {
     try {
-      dispatch(pushLoading(LoadingString.components_StockList_CustomListItem_deleteItem));
+      dispatch(pushLoading(LoadingString.components_StockList_StockistItem_deleteItem));
 
-      await db.stockRecordStore.delete(stockRecord.id as number);
+      if (stockRecord.id === undefined) {
+        return;
+      } else {
+        await db.stockRecordStore.delete(stockRecord.id);
 
-      // Read stockRecord
-      const stockRecordArray = await db.stockRecordStore
-        .where("documentId")
-        .equals(documentArray[documentIndex].id as number)
-        .toArray();
-
-      if (stockRecordArray === undefined) return;
-
-      setShowDeleteWarning(false);
-      dispatch(setStockList(stockRecordArray))
+        setShowDeleteWarning(false);
+      }
     } catch (e) {
       console.log(e);
     } finally {
-      dispatch(deleteLoading(LoadingString.components_StockList_CustomListItem_deleteItem));
+      dispatch(deleteLoading(LoadingString.components_StockList_StockistItem_deleteItem));
     }
-  }, [documentArray, documentIndex]);
+  }, []);
 
-  const customListItemDeleteButtonOnclick = React.useCallback(() => {
+  const stockListItemDeleteButtonOnclick = React.useCallback(() => {
     setShowDeleteWarning(true);
   }, []);
 
-  const customListItemButtonOnclick = React.useCallback(() => {
+  const stockListItemButtonOnclick = React.useCallback(() => {
     dispatch(setEditDialogId(stockRecord.id));
     dispatch(setShowEditDialog(true));
   }, []);
@@ -115,7 +105,7 @@ const CustomListItem = ({
         <IconButton
           edge="end"
           aria-label="delete"
-          onClick={customListItemDeleteButtonOnclick}
+          onClick={stockListItemDeleteButtonOnclick}
         >
           <DeleteIcon />
         </IconButton>
@@ -123,7 +113,7 @@ const CustomListItem = ({
       disablePadding
     >
       <ListItemButton
-        onClick={customListItemButtonOnclick}
+        onClick={stockListItemButtonOnclick}
       >
         <ListItemAvatar>
           <Avatar>
@@ -139,4 +129,4 @@ const CustomListItem = ({
   </>);
 }
 
-export default CustomListItem;
+export default StockListItem;

@@ -1,38 +1,35 @@
 import { useIndexSelector, useIndexDispatch } from "components/index/index_hooks";
-import { setArrayIndex, setEditingDocumentItem } from "components/Drawer/EditDocumentArray/EditDocumentArray_slice";
+import { setEditingDocumentId, setIsEditingDocumentItem } from "components/Drawer/EditDocumentArray/EditDocumentArray_slice";
 
 import ListItemText from '@mui/material/ListItemText';
 import ListItemButton from '@mui/material/ListItemButton';
 import Box from '@mui/material/Box';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import { setDocumentIndex } from "components/index/index_slice";
+import { setInteractingDocumentId } from "components/index/index_slice";
 import * as React from 'react';
 import { Button } from "@mui/material";
 import { pushLoading, deleteLoading } from "components/Loading/Loading_slice";
 import { LoadingString } from 'components/Loading/Loading_type';
-import { setDrawerArray } from "components/Drawer/Drawer_slice";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContentText from "@mui/material/DialogContentText";
 import { db, DBDocumentStoreItem, DBDocumentTypeEnum } from "database/db";
+import { setDocumentArray } from 'components/Drawer/Drawer_slice';
 
 const DocumentItem = ({
   item,
-  index
 }: {
   item: DBDocumentStoreItem,
-  index: number
 }) => {
   // ____ _    ____ ___  ____ _       ____ ___ ____ ___ ____
   // | __ |    |  | |__] |__| |       [__   |  |__|  |  |___
   // |__] |___ |__| |__] |  | |___    ___]  |  |  |  |  |___
   const dispatch = useIndexDispatch();
-  const { editingDocumentArray, documentArray, interactingDocumentIndex } = useIndexSelector((state) => {
+  const { isEditingDocumentArray, interactingDocumentId } = useIndexSelector((state) => {
     return {
-      editingDocumentArray: state.Drawer.editDrawerArray.editingDocumentArray,
-      documentArray: state.Drawer.drawer.documentArray,
-      interactingDocumentIndex: state.index.documentIndex
+      isEditingDocumentArray: state.Drawer.editDrawerArray.isEditingDocumentArray,
+      interactingDocumentId: state.index.interactingDocumentId
     }
   });
 
@@ -49,13 +46,15 @@ const DocumentItem = ({
   // |___ |  | |\ | |     |  | |  | |\ | [__
   // |    |__| | \| |___  |  | |__| | \| ___]
   const itemOnclick = React.useCallback(() => {
-    if (editingDocumentArray) {
-      dispatch(setArrayIndex(index));
-      dispatch(setEditingDocumentItem(true));
+    if (item.id === undefined) {
+      return;
+    } else if (isEditingDocumentArray) {
+      dispatch(setEditingDocumentId(item.id));
+      dispatch(setIsEditingDocumentItem(true));
     } else {
-      dispatch(setDocumentIndex(index));
+      dispatch(setInteractingDocumentId(item.id));
     }
-  }, [editingDocumentArray]);
+  }, [isEditingDocumentArray]);
 
   /**
    * Depends on documentArray
@@ -65,7 +64,7 @@ const DocumentItem = ({
   }, [])
 
   const DeleteButtonElement = React.useCallback(() => {
-    if (editingDocumentArray) {
+    if (isEditingDocumentArray) {
       return (<Button
         color="error"
         onClick={deleteButtonOnclick}
@@ -75,36 +74,43 @@ const DocumentItem = ({
     } else {
       return (<></>)
     }
-  }, [editingDocumentArray]);
+  }, [isEditingDocumentArray]);
 
   const deleteWarningConfirmOnclick = React.useCallback(async () => {
-    dispatch(pushLoading(LoadingString.components_Drawer_DocumentItem_deleteDocument));
-
     try {
-      switch (documentArray[index].type) {
-        case DBDocumentTypeEnum.stock:
-          await db.stockRecordStore
-            .where("documentId")
-            .equals(documentArray[index].id as number)
-            .delete();
-          break;
-        case DBDocumentTypeEnum.password:
-          await db.passwordRecordStore.delete(documentArray[index].id as number)
-          break;
+      dispatch(pushLoading(LoadingString.components_Drawer_DocumentItem_deleteDocument));
+
+      if (item.id === undefined) {
+        return;
+      } else {
+        switch (item.type) {
+          case DBDocumentTypeEnum.stock:
+            await db.stockRecordStore
+              .where("documentId")
+              .equals(item.id)
+              .delete();
+            break;
+          case DBDocumentTypeEnum.password:
+            await db.passwordRecordStore.delete(item.id)
+            break;
+        }
+
+        await db.documentStore.delete(item.id);
+
+        if (item.id === interactingDocumentId) {
+          dispatch(setInteractingDocumentId(-1));
+        }
+
+        const documentArray = await db.documentStore.toArray();
+        dispatch(setDocumentArray(documentArray))
       }
-
-      await db.documentStore.delete(documentArray[index].id as number);
-      const documents = await db.documentStore.toArray();
-
-      dispatch(setDocumentIndex(-1));
-      dispatch(setDrawerArray(documents));
     } catch (e) {
       console.log(e);
     } finally {
       setShowDeleteWarning(false);
       dispatch(deleteLoading(LoadingString.components_Drawer_DocumentItem_deleteDocument));
     }
-  }, [documentArray]);
+  }, [interactingDocumentId]);
 
   return (
     <>
@@ -114,7 +120,7 @@ const DocumentItem = ({
       >
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Confirm to delete {documentArray[index].name}?
+            Confirm to delete {item.name}?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -134,9 +140,8 @@ const DocumentItem = ({
 
       <Box
         sx={{ display: 'flex' }}
-        key={index}
         style={{
-          backgroundColor: interactingDocumentIndex === index ? "#efe" : "#fff"
+          backgroundColor: interactingDocumentId === item.id ? "#efe" : "#fff"
         }}
       >
 
