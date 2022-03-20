@@ -1,4 +1,4 @@
-import * as React from "react"
+import * as React from "react";
 import { useIndexSelector, useIndexDispatch } from "components/index/index_hooks"; // Import hooks for redux, just added typing for useSelector and useDispatch
 import { db } from "database/db";
 import { useLiveQuery } from "dexie-react-hooks";
@@ -13,7 +13,7 @@ import EditDialog from "components/Password/EditDialog/EditDialog";
 import DeleteDialog from "components/Password/DeleteDialog/DeleteDialog";
 import Item from "components/Password/Item/Item";
 import List from "@mui/material/List";
-import { setPasswordRecordArray, setDocumentPassword, setSettedDetectIdle } from "components/Password/Password_slice";
+import { setPasswordRecordArray, setDocumentPassword } from "components/Password/Password_slice";
 import { encryptPasswordRecord, decryptPasswordRecord } from "components/Password/Password_tools";
 import { pushNotificationArray } from "components/Stackbar/Stackbar_slice";
 import { useIdleTimer } from 'react-idle-timer';
@@ -208,7 +208,7 @@ const Password = () => {
         }}
       >
         <Box>
-          <h1>Enter password for 1st creation</h1>
+          <h1>Set password for 1st time</h1>
         </Box>
         <Box
           sx={{
