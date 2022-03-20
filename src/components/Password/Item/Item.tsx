@@ -92,6 +92,7 @@ const Item = ({ // Define parameters and corresponding data type
               height: "50%",
               backgroundColor: "#fff",
               borderRadius: "7px 0 0 0",
+              textTransform: 'none'
             }}
             onClick={() => copyToClipboard(item.name)}
           >
@@ -101,7 +102,8 @@ const Item = ({ // Define parameters and corresponding data type
             style={{
               height: "50%",
               backgroundColor: "#eee",
-              borderRadius: "0 0 0 7px"
+              borderRadius: "0 0 0 7px",
+              textTransform: 'none'
             }}
             onClick={() => copyToClipboard(item.password)}
           >
