@@ -13,6 +13,7 @@ import { setPasswordRecordArray } from "components/Password/Password_slice";
 import { setDeletingIndex } from "components/Password/DeleteDialog/DeleteDialog_slice";
 import { LoadingString } from "components/Loading/Loading_type";
 import { pushLoading, deleteLoading } from "components/Loading/Loading_slice";
+import { pushNotificationArray } from "components/Stackbar/Stackbar_slice";
 
 const DeleteDialog = () => {
   // ____ _    ____ ___  ____ _       ____ ___ ____ ___ ____
@@ -44,9 +45,16 @@ const DeleteDialog = () => {
     try {
       dispatch(pushLoading(LoadingString.components_Password_DeleteDialog_deleteData))
 
-      if (passwordRecordArray === undefined || deletingIndex < 0) {
+      if (passwordRecordArray === undefined) {
+        // Error stackbar
+        dispatch(pushNotificationArray({ message: "Haven't decrypt password record", variant: "error" }))
+        return
+      } else if (deletingIndex < 0) {
+        // Error stackbar
+        dispatch(pushNotificationArray({ message: "Haven't select password record data to be delete", variant: "error" }))
         return;
       } else {
+        // Calculate new password record
         let frontArray = []
         let backArray = [] as any
 
@@ -65,13 +73,22 @@ const DeleteDialog = () => {
           HMAC: HMAC
         }
 
+        // Update password record
         await db.passwordRecordStore.update(interactingDocumentId, updateValue)
+
         dispatch(setDeletingIndex(-1))
         dispatch(setPasswordRecordArray(newPasswordRecordArray))
         dispatch(setIsDeleting(false))
+
+        // Success stackbar
+        dispatch(pushNotificationArray({ message: "Success to delete password record data", variant: "success" }))
+        return
       }
     } catch (e) {
       console.log(e);
+
+      // Error stackbar
+      dispatch(pushNotificationArray({ message: "Failed to delete password record data", variant: "error" }))
     } finally {
       dispatch(deleteLoading(LoadingString.components_Password_DeleteDialog_deleteData))
     }

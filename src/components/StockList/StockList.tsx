@@ -10,6 +10,7 @@ import { pushLoading, deleteLoading } from "components/Loading/Loading_slice";
 import { useIndexSelector, useIndexDispatch } from "components/index/index_hooks";
 import { db } from "database/db";
 import { useLiveQuery } from "dexie-react-hooks";
+import { pushNotificationArray } from "components/Stackbar/Stackbar_slice";
 
 const StockList = () => {
   // ____ _    ____ ___  ____ _       ____ ___ ____ ___ ____
@@ -41,10 +42,10 @@ const StockList = () => {
   // |___ |  | |\ | |     |  | |  | |\ | [__
   // |    |__| | \| |___  |  | |__| | \| ___]
   const centerAddButtonOnclick = React.useCallback(async () => {
-    dispatch(pushLoading(LoadingString.components_StockList_StockList_add));
-
     try {
-      // Push stockRecordArray of stockStoreItem
+      dispatch(pushLoading(LoadingString.components_StockList_StockList_add));
+
+      // New stock record values
       const newStockRecord = {
         documentId: interactingDocumentId,
         name: "newStock",
@@ -52,9 +53,17 @@ const StockList = () => {
         price: 0,
       }
 
+      // Add stock record
       await db.stockRecordStore.add(newStockRecord);
+
+      // Success stackbar
+      dispatch(pushNotificationArray({ message: "Success to add stock record", variant: "success"}))
+      return
     } catch (e) {
       console.log(e);
+
+      // Error stackbar
+      dispatch(pushNotificationArray({ message: "Failed to add stock record", variant: "error"}))
     } finally {
       dispatch(deleteLoading(LoadingString.components_StockList_StockList_add))
     }

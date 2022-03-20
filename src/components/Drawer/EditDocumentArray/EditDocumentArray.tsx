@@ -12,6 +12,7 @@ import { LoadingString } from "components/Loading/Loading_type";
 import { db } from "database/db";
 import { useLiveQuery } from "dexie-react-hooks";
 import { setDocumentArray } from 'components/Drawer/Drawer_slice';
+import { pushNotificationArray } from "components/Stackbar/Stackbar_slice";
 
 const EditDrawerArray = () => {
   // ____ _    ____ ___  ____ _       ____ ___ ____ ___ ____
@@ -62,10 +63,18 @@ const EditDrawerArray = () => {
         "name": editingDocumentItemName
       });
 
+      // Set document array
       const documentArray = await db.documentStore.toArray();
       dispatch(setDocumentArray(documentArray))
+
+      // Success stackbar
+      dispatch(pushNotificationArray({ message: "Success to edit document name", variant: "success"}))
+      return
     } catch (e) {
       console.log(e);
+
+      // Error stackbar
+      dispatch(pushNotificationArray({ message: "Failed to edit document name", variant: "error"}))
     } finally {
       dispatch(deleteLoading(LoadingString.components_Drawer_EditDocumentArray_EditDocumentArray_save))
     }

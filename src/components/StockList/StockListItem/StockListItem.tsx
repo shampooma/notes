@@ -22,6 +22,7 @@ import {
 } from "components/StockList/EditDialog/EditDialog_slice";
 import { LoadingString } from "components/Loading/Loading_type";
 import { db, DBStockRecord } from "database/db";
+import { pushNotificationArray } from "components/Stackbar/Stackbar_slice";
 
 const StockListItem = ({
   stockRecord
@@ -54,14 +55,25 @@ const StockListItem = ({
       dispatch(pushLoading(LoadingString.components_StockList_StockistItem_deleteItem));
 
       if (stockRecord.id === undefined) {
+        // Error stackbar
+        dispatch(pushNotificationArray({ message: "Haven't select stock record to be delete", variant: "error"}))
         return;
       } else {
+        // Delete stock record
         await db.stockRecordStore.delete(stockRecord.id);
 
+        // Close dialog
         setShowDeleteWarning(false);
+
+        // Success stackbar
+        dispatch(pushNotificationArray({ message: "Success to delete stock record", variant: "success"}))
+        return;
       }
     } catch (e) {
       console.log(e);
+
+      // Error stackbar
+      dispatch(pushNotificationArray({ message: "Failed to delete stock record", variant: "error"}))
     } finally {
       dispatch(deleteLoading(LoadingString.components_StockList_StockistItem_deleteItem));
     }

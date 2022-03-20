@@ -20,8 +20,9 @@ import TextField from '@mui/material/TextField';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import CardActionArea from '@mui/material/CardActionArea';
+import { pushNotificationArray } from "components/Stackbar/Stackbar_slice";
 
-const documentArray = [
+const selectDocumentArray = [
   {
     icon: ShowChartIcon,
     title: 'Stock Record',
@@ -50,7 +51,6 @@ const NewDocumentDialog = () => {
   const [documentType, setDocumentType] = React.useState<DBDocumentTypeEnum>(DBDocumentTypeEnum.stock);
   const [documentName, setDocumentName] = React.useState<string>("");
 
-
   // _  _ ____ ____    _  _ ____ ____ _  _ ____
   // |  | [__  |___    |__| |  | |  | |_/  [__
   // |__| ___] |___    |  | |__| |__| | \_ ___]
@@ -74,6 +74,7 @@ const NewDocumentDialog = () => {
     try {
       dispatch(pushLoading(LoadingString.components_Drawer_Drawer_addDocument));
 
+      // Calculate new document values
       const newDocument = {
         name: documentName,
         type: documentType,
@@ -82,16 +83,25 @@ const NewDocumentDialog = () => {
       // Add new document
       const newDocumentId = await db.documentStore.add(newDocument);
 
+      // Change interacting document id if it is -1
       if (interactingDocumentId === -1) {
         dispatch(setInteractingDocumentId(Number(newDocumentId)));
       }
 
+      // Set document array
       const documentArray = await db.documentStore.toArray();
       dispatch(setDocumentArray(documentArray))
 
       dispatch(setCreatingDocument(false));
+
+      // Success stackbar
+      dispatch(pushNotificationArray({ message: "Success to add document record", variant: "success"}))
+      return
     } catch (e) {
       console.log(e);
+
+      // Error stackbar
+      dispatch(pushNotificationArray({ message: "Failed to add document record", variant: "error"}))
     } finally {
       dispatch(deleteLoading(LoadingString.components_Drawer_Drawer_addDocument));
     }
@@ -124,7 +134,7 @@ const NewDocumentDialog = () => {
         display="flex"
         justifyContent="center"
       >
-        {documentArray.map((item, i) => (
+        {selectDocumentArray.map((item, i) => (
           <Card
             key={i}
             style={{
@@ -140,7 +150,6 @@ const NewDocumentDialog = () => {
               <CardMedia>
                 <Box
                   display="flex"
-                  // width="100%"
                   justifyContent="center"
                 >
                   <item.icon style={{ fontSize: 100 }} />

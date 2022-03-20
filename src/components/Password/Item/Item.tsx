@@ -7,6 +7,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
+import { pushNotificationArray } from "components/Stackbar/Stackbar_slice";
 
 const Item = ({ // Define parameters and corresponding data type
   item,
@@ -41,6 +42,9 @@ const Item = ({ // Define parameters and corresponding data type
     el.select();
     document.execCommand('copy');
     document.body.removeChild(el);
+
+    // Success stackbar
+    dispatch(pushNotificationArray({ message: `Copied ${str}`, variant: "success"}))
   }, []);
 
   const editIconButtonOnclick = React.useCallback(() => {

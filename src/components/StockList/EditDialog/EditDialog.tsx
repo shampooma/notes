@@ -21,6 +21,7 @@ import {
 import { LoadingString } from "components/Loading/Loading_type";
 import { IconButton } from "@mui/material";
 import { db } from "database/db";
+import { pushNotificationArray } from "components/Stackbar/Stackbar_slice";
 import { useLiveQuery } from "dexie-react-hooks";
 
 const EditDialog = () => {
@@ -76,10 +77,16 @@ const EditDialog = () => {
     try {
       dispatch(pushLoading(LoadingString.components_StockList_EditDialog_addStock));
 
-      if (Number(addPosition) === 0 || editingStockRecord === undefined) {
+      if (Number(addPosition) === 0) {
+        // Warning stackbar
+        dispatch(pushNotificationArray({ message: "Position to be add equals 0", variant: "warning"}))
+        return
+      } else if (editingStockRecord === undefined) {
+        // Error stackbar
+        dispatch(pushNotificationArray({ message: "Haven't select stock record to be edit", variant: "error"}))
         return;
       } else {
-        // Update stockRecord
+        // Calculate update values
         const { price: oldPrice, position: oldPosition } = editingStockRecord;
 
         const updateValues = {
@@ -87,10 +94,18 @@ const EditDialog = () => {
           position: (oldPosition + Number(addPosition))
         }
 
+        // Update stock record
         await db.stockRecordStore.update(editDialogId, updateValues);
+
+        // Success stackbar
+        dispatch(pushNotificationArray({ message: `Success to add stock data with price ${addPrice} and position ${addPosition}`, variant: "success"}))
+        return
       }
     } catch (e) {
       console.log(e);
+
+      // Error stackbar
+      dispatch(pushNotificationArray({ message: "Failed to add stock data", variant: "error"}))
     } finally {
       dispatch(deleteLoading(LoadingString.components_StockList_EditDialog_addStock));
     }
@@ -106,9 +121,11 @@ const EditDialog = () => {
       dispatch(pushLoading(LoadingString.components_StockList_EditDialog_deleteStock))
 
       if (editingStockRecord === undefined) {
+        // Error stackbar
+        dispatch(pushNotificationArray({ message: "Haven't select stock record to be edit", variant: "error"}))
         return;
       } else {
-        // Delete stock
+        // Calculate update values
         const updateValues = {} as {
           price: number,
           position: number,
@@ -121,10 +138,18 @@ const EditDialog = () => {
           updateValues.position = editingStockRecord.position - Number(deletePosition)
         }
 
+        // Update stock record
         await db.stockRecordStore.update(editDialogId, updateValues);
+
+        // Success stackbar
+        dispatch(pushNotificationArray({ message: `Success to delete ${deletePosition} position`, variant: "success"}))
+        return;
       }
     } catch (e) {
       console.log(e);
+
+      // Error stackbar
+      dispatch(pushNotificationArray({ message: "Failed to delete position", variant: "error"}))
     } finally {
       dispatch(deleteLoading(LoadingString.components_StockList_EditDialog_deleteStock))
     }
@@ -147,16 +172,25 @@ const EditDialog = () => {
     try {
       dispatch(pushLoading(LoadingString.components_StockList_EditDialog_updateName))
 
-      // Update stock
+      // Calculate update values
       const updateValues = {
         name: updateName
       }
 
+      // Update stock record
       await db.stockRecordStore.update(editDialogId, updateValues);
 
+      // Set editing name false
       setEditingName(false);
+
+      // Success stackbar
+      dispatch(pushNotificationArray({ message: "Success to update name", variant: "success"}))
+      return
     } catch (e) {
       console.log(e);
+
+      // Error stackbar
+      dispatch(pushNotificationArray({ message: "Failed to update name", variant: "error"}))
     } finally {
       dispatch(deleteLoading(LoadingString.components_StockList_EditDialog_updateName))
     }
