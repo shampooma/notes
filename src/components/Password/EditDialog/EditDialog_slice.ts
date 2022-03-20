@@ -4,22 +4,22 @@ export const EditDialogSlice = createSlice({ // Slice copntains reducers and act
   name: 'EditDialog',
   initialState: {
     isEditing: false,
-    editingId: -1,
+    editingIndex: -1,
   } as {
     isEditing: boolean,
-    editingId: number,
+    editingIndex: number,
   },
   reducers: {
     setIsEditing: (state, action: PayloadAction<boolean>) => {
       state.isEditing = action.payload;
     },
-    setEditingId: (state, action: PayloadAction<number>) => {
-      state.editingId = action.payload;
+    setEditingIndex: (state, action: PayloadAction<number>) => {
+      state.editingIndex = action.payload;
     },
   },
 });
 
-export const { setIsEditing, setEditingId } = EditDialogSlice.actions;
+export const { setIsEditing, setEditingIndex } = EditDialogSlice.actions;
 
 export const EditDialogReducer = combineReducers({
   EditDialog: EditDialogSlice.reducer,

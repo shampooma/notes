@@ -11,16 +11,22 @@ import DialogContent from '@mui/material/DialogContent';
 import Box from '@mui/material/Box';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
+import { encryptPasswordRecord } from "components/Password/Password";
+import { setPasswordRecordArray, setDocumentPassword } from "components/Password/Password_slice";
 
 const EditDialog = () => {
   // ____ _    ____ ___  ____ _       ____ ___ ____ ___ ____
   // | __ |    |  | |__] |__| |       [__   |  |__|  |  |___
   // |__] |___ |__| |__] |  | |___    ___]  |  |  |  |  |___
   const dispatch = useIndexDispatch();
-  const { isEditing, editingId } = useIndexSelector((state) => { // Get global state that needed
+  const { documentIndex, documentArray, isEditing, editingIndex, passwordRecordArray, documentPassword } = useIndexSelector((state) => { // Get global state that needed
     return {
+      documentIndex: state.index.documentIndex,
+      documentArray: state.Drawer.drawer.documentArray,
       isEditing: state.Password.EditDialog.EditDialog.isEditing,
-      editingId: state.Password.EditDialog.EditDialog.editingId,
+      editingIndex: state.Password.EditDialog.EditDialog.editingIndex,
+      passwordRecordArray: state.Password.Password.passwordRecordArray,
+      documentPassword: state.Password.Password.documentPassword,
     }
   });
 
@@ -36,29 +42,45 @@ const EditDialog = () => {
   // |__| ___] |___    |  | |__| |__| | \_ ___]
   React.useEffect(() => {
     (async () => {
-      const passwordItem = await db.passwordRecordStore.get(editingId);
-
-      if (passwordItem === undefined) {
+      if (passwordRecordArray === undefined || editingIndex < 0) {
         return;
       }
 
-      setDescription(passwordItem.description)
-      setName(passwordItem.name)
-      setPassword(passwordItem.password)
+      setDescription(passwordRecordArray[editingIndex].description)
+      setName(passwordRecordArray[editingIndex].name)
+      setPassword(passwordRecordArray[editingIndex].password)
     })()
-  }, [editingId, isEditing])
+  }, [passwordRecordArray, editingIndex])
 
 
   // ____ _  _ _  _ ____ ___ _ ____ _  _ ____
   // |___ |  | |\ | |     |  | |  | |\ | [__
   // |    |__| | \| |___  |  | |__| | \| ___]
-  const updateButtonOnclick = React.useCallback(() => {
-    db.passwordRecordStore.update(editingId, {
+  const updateButtonOnclick = React.useCallback(async () => {
+    if (passwordRecordArray === undefined || documentPassword === "" || editingIndex < 0) {
+      return;
+    }
+
+    const newValue = {
       description: description,
       name: name,
-      password: password,
-    })
-  }, [description, name, password, editingId]);
+      password: password
+    }
+
+    const newPasswordRecordArray = passwordRecordArray.slice();
+
+    newPasswordRecordArray[editingIndex] = newValue;
+
+    const { encryptedData, HMAC } = encryptPasswordRecord(JSON.stringify(newPasswordRecordArray), documentPassword)
+
+    const updateValue = {
+      encryptedData: encryptedData,
+      HMAC: HMAC
+    }
+
+    await db.passwordRecordStore.update(documentArray[documentIndex].id as number, updateValue)
+    dispatch(setPasswordRecordArray(newPasswordRecordArray))
+  }, [documentArray, documentIndex, passwordRecordArray, description, name, password, editingIndex, documentPassword]);
 
   // ____ ____ ___ _  _ ____ _  _
   // |__/ |___  |  |  | |__/ |\ |

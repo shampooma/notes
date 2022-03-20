@@ -75,19 +75,6 @@ const NewDocumentDialog = () => {
     try {
       dispatch(pushLoading(LoadingString.components_Drawer_Drawer_addDocument));
 
-      switch (documentType) {
-        case DBDocumentTypeEnum.stock:
-          const newStockRecord = {
-            stockRecordArray: []
-          }
-
-          // Add new stockRecord
-          await db.stockRecordStore.add(newStockRecord);
-          break;
-        case DBDocumentTypeEnum.password:
-          break;
-      }
-
       const newDocument = {
         name: documentName,
         type: documentType,

@@ -1,17 +1,19 @@
 import * as React from "react"
 import { useIndexDispatch } from "components/index/index_hooks"; // Import hooks for redux, just added typing for useSelector and useDispatch
-import { DBPasswordRecord } from "database/db";
-import { setIsEditing, setEditingId } from "components/Password/EditDialog/EditDialog_slice";
-import { setIsDeleting, setDeletingId } from "components/Password/DeleteDialog/DeleteDialog_slice";
+import { DBPasswordRecordData } from "database/db";
+import { setIsEditing, setEditingIndex } from "components/Password/EditDialog/EditDialog_slice";
+import { setIsDeleting, setDeletingIndex } from "components/Password/DeleteDialog/DeleteDialog_slice";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 
 const Item = ({ // Define parameters and corresponding data type
-  item
+  item,
+  index
 }: {
-  item: DBPasswordRecord
+  item: DBPasswordRecordData,
+  index: number
 }) => {
   // ____ _    ____ ___  ____ _       ____ ___ ____ ___ ____
   // | __ |    |  | |__] |__| |       [__   |  |__|  |  |___
@@ -43,13 +45,12 @@ const Item = ({ // Define parameters and corresponding data type
 
   const editIconButtonOnclick = React.useCallback(() => {
     dispatch(setIsEditing(true));
-    dispatch(setEditingId(item.id as number));
+    dispatch(setEditingIndex(index));
   }, []);
 
   const deleteIconButtonOnclick = React.useCallback(() => {
-    console.log(item.id)
     dispatch(setIsDeleting(true));
-    dispatch(setDeletingId(item.id as number));
+    dispatch(setDeletingIndex(index));
   }, []);
 
   // ____ ____ ___ _  _ ____ _  _

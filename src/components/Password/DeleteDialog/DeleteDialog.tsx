@@ -1,9 +1,6 @@
 import * as React from "react"
 import { useIndexSelector, useIndexDispatch } from "components/index/index_hooks"; // Import hooks for redux, just added typing for useSelector and useDispatch
-import { db, DBPasswordRecord } from "database/db";
-import { useLiveQuery } from "dexie-react-hooks";
-import { LoadingString } from "components/Loading/Loading_type";
-import { pushLoading, deleteLoading } from "components/Loading/Loading_slice";
+import { db } from "database/db";
 import { setIsDeleting } from "components/Password/DeleteDialog/DeleteDialog_slice";
 import Button from '@mui/material/Button';
 import Dialog from "@mui/material/Dialog";
@@ -11,17 +8,23 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContentText from "@mui/material/DialogContentText";
 import Box from "@mui/material/Box";
-
+import { encryptPasswordRecord } from "components/Password/Password";
+import { setPasswordRecordArray } from "components/Password/Password_slice";
+import { setDeletingIndex } from "components/Password/DeleteDialog/DeleteDialog_slice";
 
 const DeleteDialog = () => {
   // ____ _    ____ ___  ____ _       ____ ___ ____ ___ ____
   // | __ |    |  | |__] |__| |       [__   |  |__|  |  |___
   // |__] |___ |__| |__] |  | |___    ___]  |  |  |  |  |___
   const dispatch = useIndexDispatch();
-  const { isDeleting, deletingId } = useIndexSelector((state) => { // Get global state that needed
+  const { documentIndex, documentArray, isDeleting, deletingIndex, passwordRecordArray, documentPassword } = useIndexSelector((state) => { // Get global state that needed
     return {
+      documentIndex: state.index.documentIndex,
+      documentArray: state.Drawer.drawer.documentArray,
       isDeleting: state.Password.DeleteDialog.DeleteDialog.isDeleting,
-      deletingId: state.Password.DeleteDialog.DeleteDialog.deletingId,
+      deletingIndex: state.Password.DeleteDialog.DeleteDialog.deletingIndex,
+      passwordRecordArray: state.Password.Password.passwordRecordArray,
+      documentPassword: state.Password.Password.documentPassword,
     }
   });
 
@@ -36,24 +39,44 @@ const DeleteDialog = () => {
   // ____ _  _ _  _ ____ ___ _ ____ _  _ ____
   // |___ |  | |\ | |     |  | |  | |\ | [__
   // |    |__| | \| |___  |  | |__| | \| ___]
-  const passwordItem = useLiveQuery(
-    () => db.passwordRecordStore.get(deletingId),
-    [deletingId]
-  );
-
   const confirmOnClick = React.useCallback(() => {
     (async () => {
-      await db.passwordRecordStore.delete(deletingId)
+      if (passwordRecordArray === undefined || deletingIndex < 0) {
+        return;
+      }
+
+      let frontArray = []
+      let backArray = [] as any
+
+      frontArray = passwordRecordArray.slice(0, deletingIndex);
+
+      if (passwordRecordArray.length > deletingIndex + 1) {
+        backArray = passwordRecordArray.slice(deletingIndex + 1, passwordRecordArray.length)
+      }
+
+      const newPasswordRecordArray = [...frontArray, ...backArray];
+
+      const { encryptedData, HMAC } = encryptPasswordRecord(JSON.stringify(newPasswordRecordArray), documentPassword)
+
+      const updateValue = {
+        encryptedData: encryptedData,
+        HMAC: HMAC
+      }
+
+      await db.passwordRecordStore.update(documentArray[documentIndex].id as number, updateValue)
+      dispatch(setDeletingIndex(-1))
+      dispatch(setPasswordRecordArray(newPasswordRecordArray))
       dispatch(setIsDeleting(false))
     })()
-  }, [deletingId])
+  }, [documentArray, documentIndex, passwordRecordArray, deletingIndex])
 
   // ____ ____ ___ _  _ ____ _  _
   // |__/ |___  |  |  | |__/ |\ |
   // |  \ |___  |  |__| |  \ | \|
-  if (passwordItem === undefined) {
+  if (passwordRecordArray === undefined || deletingIndex < 0) {
     return <></>;
   } else {
+    console.log(deletingIndex)
     return (<>
       <Dialog
         open={isDeleting}
@@ -61,7 +84,7 @@ const DeleteDialog = () => {
       >
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Confirm to delete password with name {passwordItem.name}?
+            Confirm to delete password with name {passwordRecordArray[deletingIndex].name}?
           </DialogContentText>
         </DialogContent>
         <DialogActions>

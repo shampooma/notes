@@ -4,22 +4,22 @@ export const DeleteDialogSlice = createSlice({ // Slice copntains reducers and a
   name: 'DeleteDialog',
   initialState: {
     isDeleting: false,
-    deletingId: -1,
+    deletingIndex: -1,
   } as {
     isDeleting: boolean,
-    deletingId: number,
+    deletingIndex: number,
   },
   reducers: {
     setIsDeleting: (state, action: PayloadAction<boolean>) => {
       state.isDeleting = action.payload;
     },
-    setDeletingId: (state, action: PayloadAction<number>) => {
-      state.deletingId = action.payload;
+    setDeletingIndex: (state, action: PayloadAction<number>) => {
+      state.deletingIndex = action.payload;
     }
   },
 });
 
-export const { setIsDeleting, setDeletingId } = DeleteDialogSlice.actions;
+export const { setIsDeleting, setDeletingIndex } = DeleteDialogSlice.actions;
 
 export const DeleteDialogReducer = combineReducers({
   DeleteDialog: DeleteDialogSlice.reducer,

@@ -8,12 +8,16 @@ export interface DBStockRecord {
   position: number,
 }
 
-export interface DBPasswordRecord {
-  id?: number,
-  documentId: number,
+export interface DBPasswordRecordData {
   description: string,
   name: string,
   password: string
+}
+
+export interface DBPasswordRecordItem {
+  documentId: number,
+  encryptedData: string
+  HMAC: string,
 }
 
 export enum DBDocumentTypeEnum {
@@ -29,15 +33,15 @@ export interface DBDocumentStoreItem {
 
 // class NoteDb extends Dexie {
 //   stockRecordStore!: Table<DBStockRecord>;
-//   passwordRecordStore!: Table<DBPasswordRecord>;
+//   passwordRecordStore!: Table<DBPasswordRecordItem>;
 //   documentStore!: Table<DBDocumentStoreItem>;
 
 
 //   constructor() {
 //     super('NoteDb');
-//     this.version(5).stores({
+//     this.version(1).stores({
 //       stockRecordStore: '++id, documentId',
-//       passwordRecordStore: '++id, documentId',
+//       passwordRecordStore: 'documentId',
 //       documentStore: '++id',
 //     });
 //   }
@@ -50,6 +54,6 @@ export const db = new Dexie("NoteDb");
 
 db.version(1).stores({
   stockRecordStore: '++id, documentId',
-  passwordRecordStore: '++id, documentId',
+  passwordRecordStore: 'documentId',
   documentStore: '++id',
 });
