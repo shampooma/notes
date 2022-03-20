@@ -13,20 +13,22 @@ import EditDialog from "components/Password/EditDialog/EditDialog";
 import DeleteDialog from "components/Password/DeleteDialog/DeleteDialog";
 import Item from "components/Password/Item/Item";
 import List from "@mui/material/List";
-import { setPasswordRecordArray, setDocumentPassword } from "components/Password/Password_slice";
+import { setPasswordRecordArray, setDocumentPassword, setSettedDetectIdle } from "components/Password/Password_slice";
 import { encryptPasswordRecord, decryptPasswordRecord } from "components/Password/Password_tools";
 import { pushNotificationArray } from "components/Stackbar/Stackbar_slice";
+import { useIdleTimer } from 'react-idle-timer';
 
 const Password = () => {
   // ____ _    ____ ___  ____ _       ____ ___ ____ ___ ____
   // | __ |    |  | |__] |__| |       [__   |  |__|  |  |___
   // |__] |___ |__| |__] |  | |___    ___]  |  |  |  |  |___
   const dispatch = useIndexDispatch();
-  const { interactingDocumentId, passwordRecordArray, documentPassword } = useIndexSelector((state) => {
+  const { interactingDocumentId, passwordRecordArray, documentPassword, settedDetectIdle } = useIndexSelector((state) => {
     return {
       interactingDocumentId: state.index.interactingDocumentId,
       passwordRecordArray: state.Password.Password.passwordRecordArray,
       documentPassword: state.Password.Password.documentPassword,
+      settedDetectIdle: state.Password.Password.settedDetectIdle,
     }
   })
 
@@ -42,15 +44,24 @@ const Password = () => {
   // |  | [__  |___    |__| |  | |  | |_/  [__
   // |__| ___] |___    |  | |__| |__| | \_ ___]
   const passwordRecordItem = useLiveQuery(
-    () => {
-      return db.passwordRecordStore.get(interactingDocumentId);
-    },
+    () => db.passwordRecordStore.get(interactingDocumentId),
     [interactingDocumentId]
   );
 
   React.useEffect(() => {
+    dispatch(setDocumentPassword(""));
     dispatch(setPasswordRecordArray(undefined));
   }, [interactingDocumentId])
+
+  useIdleTimer({
+    timeout: 1000 * 60,
+    onIdle: () => {
+      dispatch(setDocumentPassword(""));
+      dispatch(setPasswordRecordArray(undefined));
+      dispatch(pushNotificationArray({ message: "Encrypted password record due to inactive", variant: "info" }))
+    },
+    debounce: 500
+  })
 
   // ____ _  _ _  _ ____ ___ _ ____ _  _ ____
   // |___ |  | |\ | |     |  | |  | |\ | [__
@@ -61,7 +72,7 @@ const Password = () => {
 
       if (passwordRecordArray === undefined) {
         // Error stackbar
-        dispatch(pushNotificationArray({ message: "Haven't decrypt password record", variant: "error"}))
+        dispatch(pushNotificationArray({ message: "Haven't decrypt password record", variant: "error" }))
         return;
       } else {
         // Calculate update values
@@ -85,14 +96,14 @@ const Password = () => {
         dispatch(setPasswordRecordArray(newPasswordRecordArray))
 
         // Success stackbar
-        dispatch(pushNotificationArray({ message: "Success to add password record", variant: "success"}))
+        dispatch(pushNotificationArray({ message: "Success to add password record", variant: "success" }))
         return
       }
     } catch (e) {
       console.log(e);
 
       // Error stackbar
-      dispatch(pushNotificationArray({ message: "Failed to add password record", variant: "error"}))
+      dispatch(pushNotificationArray({ message: "Failed to add password record", variant: "error" }))
     } finally {
       dispatch(deleteLoading(LoadingString.components_Password_Password_add))
     }
@@ -104,15 +115,15 @@ const Password = () => {
 
       if (confirmPassword !== targetPassword) {
         // Error stackbar
-        dispatch(pushNotificationArray({ message: "Password mismatch", variant: "error"}))
+        dispatch(pushNotificationArray({ message: "Password mismatch", variant: "error" }))
         return
       } else if (targetPassword === "") {
         // Error stackbar
-        dispatch(pushNotificationArray({ message: "Password cannot be empty", variant: "error"}))
+        dispatch(pushNotificationArray({ message: "Password cannot be empty", variant: "error" }))
         return
       } else if (interactingDocumentId === undefined) {
         // Error stackbar
-        dispatch(pushNotificationArray({ message: "Not interacting with a document", variant: "error"}))
+        dispatch(pushNotificationArray({ message: "Not interacting with a document", variant: "error" }))
         return
       } else {
         // Encrypt password record data
@@ -125,15 +136,18 @@ const Password = () => {
           HMAC: HMAC,
         })
 
+        setTargetPassword("");
+        setConfirmPassword("");
+
         // Success stackbar
-        dispatch(pushNotificationArray({ message: "Success to set password", variant: "success"}))
+        dispatch(pushNotificationArray({ message: "Success to set password", variant: "success" }))
         return
       }
     } catch (e) {
       console.log(e);
 
       // Error stackbar
-      dispatch(pushNotificationArray({ message: "Failed to set password", variant: "error"}))
+      dispatch(pushNotificationArray({ message: "Failed to set password", variant: "error" }))
     } finally {
       dispatch(deleteLoading(LoadingString.components_Password_Password_setPassword))
     }
@@ -147,7 +161,7 @@ const Password = () => {
 
       if (passwordRecord === undefined) {
         // Error stackbar
-        dispatch(pushNotificationArray({ message: "Don't have this password record", variant: "error"}))
+        dispatch(pushNotificationArray({ message: "Don't have this password record", variant: "error" }))
         return
       } else {
         // Try to decrypt password record
@@ -161,14 +175,15 @@ const Password = () => {
           setDecryptPasswordError(true);
 
           // Error stackbar
-          dispatch(pushNotificationArray({ message: "Failed to decrypt password record", variant: "error"}))
+          dispatch(pushNotificationArray({ message: "Failed to decrypt password record", variant: "error" }))
           return;
         } else {
           dispatch(setDocumentPassword(decryptPassword));
           dispatch(setPasswordRecordArray(JSON.parse(data)));
+          setDecryptPassword("");
 
           // Success stackbar
-          dispatch(pushNotificationArray({ message: "Success to decrypt password record", variant: "success"}))
+          dispatch(pushNotificationArray({ message: "Success to decrypt password record", variant: "success" }))
           return
         }
       }
@@ -176,7 +191,7 @@ const Password = () => {
       console.log(e)
 
       // Error stackbar
-      dispatch(pushNotificationArray({ message: "Failed to decrypt password record", variant: "error"}))
+      dispatch(pushNotificationArray({ message: "Failed to decrypt password record", variant: "error" }))
     } finally {
       dispatch(deleteLoading(LoadingString.components_Password_Password_decrypt))
     }
