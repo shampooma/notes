@@ -18,7 +18,7 @@ import DeleteDialog from "components/Password/DeleteDialog/DeleteDialog";
 import Item from "components/Password/Item/Item";
 import List from "@mui/material/List";
 import { setPasswordRecordArray, setDocumentPassword } from "components/Password/Password_slice";
-import { encryptPasswordRecord, decryptPasswordrecord } from "components/Password/Password_tools";
+import { encryptPasswordRecord, decryptPasswordRecord } from "components/Password/Password_tools";
 
 
 const Password = () => {

@@ -8,7 +8,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContentText from "@mui/material/DialogContentText";
 import Box from "@mui/material/Box";
-import { encryptPasswordRecord } from "components/Password/Password";
+import { encryptPasswordRecord } from "components/Password/Password_tools";
 import { setPasswordRecordArray } from "components/Password/Password_slice";
 import { setDeletingIndex } from "components/Password/DeleteDialog/DeleteDialog_slice";
 

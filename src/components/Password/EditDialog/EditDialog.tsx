@@ -11,7 +11,7 @@ import DialogContent from '@mui/material/DialogContent';
 import Box from '@mui/material/Box';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
-import { encryptPasswordRecord } from "components/Password/Password";
+import { encryptPasswordRecord } from "components/Password/Password_tools";
 import { setPasswordRecordArray, setDocumentPassword } from "components/Password/Password_slice";
 
 const EditDialog = () => {
