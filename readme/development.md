@@ -207,6 +207,29 @@ export default Component1;
 
 Using Dexie
 
+<h3>4.1. Usage</h3>
+
+1. Add a entry to `LoadingString` in `components/Loading/Loading_type`
+
+2. ```ts
+   import { LoadingString } from "components/Loading/Loading_type";
+   import { pushLoading, deleteLoading } from "components/Loading/Loading_slice";
+   import { useIndexDispatch } from "components/index/index_hooks";
+   import { db } from "database/db";
+
+   const dispatch = useIndexDispatch();
+
+   try {
+    dispatch(pushLoading(LoadingString.string))
+    await db.store.get(0);
+   } catch (e) {
+     console.log(e);
+   } finally {
+     dispatch(deleteLoading(LoadingString.string))
+   }
+
+   ```
+
 <h2 id="5.">5. Bugs</h2>
 
 <h3>Bug 0</h3>

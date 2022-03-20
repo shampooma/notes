@@ -9,7 +9,9 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Box from "@mui/material/Box";
 import { setCreatingDocument } from "components/Drawer/NewDocumentDialog/NewDocumentDialog_slice";
 import { pushLoading, deleteLoading } from "components/Loading/Loading_slice";
+import { setInteractingDocumentId } from "components/index/index_slice";
 import { LoadingString } from 'components/Loading/Loading_type';
+import { setDocumentArray } from 'components/Drawer/Drawer_slice';
 import ImageListItemBar from '@mui/material/ImageListItemBar';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import KeyIcon from '@mui/icons-material/Key';
@@ -18,8 +20,6 @@ import TextField from '@mui/material/TextField';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import CardActionArea from '@mui/material/CardActionArea';
-import { setDrawerArray } from 'components/Drawer/Drawer_slice';
-
 
 const documentArray = [
   {
@@ -37,9 +37,10 @@ const NewDocumentDialog = () => {
   // | __ |    |  | |__] |__| |       [__   |  |__|  |  |___
   // |__] |___ |__| |__] |  | |___    ___]  |  |  |  |  |___
   const dispatch = useIndexDispatch();
-  const { creatingDocument } = useIndexSelector((state) => { // Get global state that needed
+  const { creatingDocument, interactingDocumentId } = useIndexSelector((state) => { // Get global state that needed
     return {
       creatingDocument: state.Drawer.newDocument.creatingDocument,
+      interactingDocumentId: state.index.interactingDocumentId,
     }
   });
 
@@ -79,12 +80,15 @@ const NewDocumentDialog = () => {
       }
 
       // Add new document
-      await db.documentStore.add(newDocument);
+      const newDocumentId = await db.documentStore.add(newDocument);
 
-      // Read all document
-      const documents = await db.documentStore.toArray();
+      if (interactingDocumentId === -1) {
+        dispatch(setInteractingDocumentId(Number(newDocumentId)));
+      }
 
-      dispatch(setDrawerArray(documents));
+      const documentArray = await db.documentStore.toArray();
+      dispatch(setDocumentArray(documentArray))
+
       dispatch(setCreatingDocument(false));
     } catch (e) {
       console.log(e);

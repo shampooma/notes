@@ -4,17 +4,17 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 export const indexSlice = createSlice({
   name: 'index',
   initialState: {
-    documentIndex: -1,
+    interactingDocumentId: -1,
   } as {
-    documentIndex: number,
+    interactingDocumentId: number,
   },
   reducers: {
-    setDocumentIndex: (state, action: PayloadAction<number>) => {
-      state.documentIndex = action.payload;
+    setInteractingDocumentId: (state, action: PayloadAction<number>) => {
+      state.interactingDocumentId = action.payload;
     },
   },
 });
 
-export const { setDocumentIndex } = indexSlice.actions;
+export const { setInteractingDocumentId } = indexSlice.actions;
 
 export const indexReducer = indexSlice.reducer;

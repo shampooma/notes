@@ -7,18 +7,18 @@ import { newDocumentSlice } from "components/Drawer/NewDocumentDialog/NewDocumen
 export const DrawerSlice = createSlice({
   name: 'Drawer',
   initialState: {
-    documentArray: [],
+    documentArray: []
   } as {
-    documentArray: DBDocumentStoreItem[],
+    documentArray: DBDocumentStoreItem[]
   },
   reducers: {
-    setDrawerArray: (state, action: PayloadAction<DBDocumentStoreItem[]>) => {
+    setDocumentArray: (state, action: PayloadAction<DBDocumentStoreItem[]>) => {
       state.documentArray = action.payload;
     },
   },
 });
 
-export const { setDrawerArray } = DrawerSlice.actions;
+export const { setDocumentArray } = DrawerSlice.actions;
 
 export const DrawerReducer = combineReducers({ // Return combined reducers, if not the head of directory, just return a reducer is ok
   editDrawerArray: editDrawerArraySlice.reducer,

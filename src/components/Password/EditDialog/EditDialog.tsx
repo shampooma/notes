@@ -19,10 +19,9 @@ const EditDialog = () => {
   // | __ |    |  | |__] |__| |       [__   |  |__|  |  |___
   // |__] |___ |__| |__] |  | |___    ___]  |  |  |  |  |___
   const dispatch = useIndexDispatch();
-  const { documentIndex, documentArray, isEditing, editingIndex, passwordRecordArray, documentPassword } = useIndexSelector((state) => { // Get global state that needed
+  const { interactingDocumentId, isEditing, editingIndex, passwordRecordArray, documentPassword } = useIndexSelector((state) => { // Get global state that needed
     return {
-      documentIndex: state.index.documentIndex,
-      documentArray: state.Drawer.drawer.documentArray,
+      interactingDocumentId: state.index.interactingDocumentId,
       isEditing: state.Password.EditDialog.EditDialog.isEditing,
       editingIndex: state.Password.EditDialog.EditDialog.editingIndex,
       passwordRecordArray: state.Password.Password.passwordRecordArray,
@@ -41,15 +40,16 @@ const EditDialog = () => {
   // |  | [__  |___    |__| |  | |  | |_/  [__
   // |__| ___] |___    |  | |__| |__| | \_ ___]
   React.useEffect(() => {
-    (async () => {
-      if (passwordRecordArray === undefined || editingIndex < 0) {
-        return;
-      }
-
+    if (passwordRecordArray === undefined || editingIndex < 0 || passwordRecordArray[editingIndex] === undefined) {
+      setDescription("")
+      setName("")
+      setPassword("")
+      return;
+    } else {
       setDescription(passwordRecordArray[editingIndex].description)
       setName(passwordRecordArray[editingIndex].name)
       setPassword(passwordRecordArray[editingIndex].password)
-    })()
+    }
   }, [passwordRecordArray, editingIndex])
 
 
@@ -57,30 +57,38 @@ const EditDialog = () => {
   // |___ |  | |\ | |     |  | |  | |\ | [__
   // |    |__| | \| |___  |  | |__| | \| ___]
   const updateButtonOnclick = React.useCallback(async () => {
-    if (passwordRecordArray === undefined || documentPassword === "" || editingIndex < 0) {
-      return;
+    try {
+      dispatch(pushLoading(LoadingString.components_Password_EditDialog_updateData));
+
+      if (passwordRecordArray === undefined || documentPassword === "" || editingIndex < 0) {
+        return;
+      } else {
+        const newValue = {
+          description: description,
+          name: name,
+          password: password
+        }
+
+        const newPasswordRecordArray = passwordRecordArray.slice();
+
+        newPasswordRecordArray[editingIndex] = newValue;
+
+        const { encryptedData, HMAC } = encryptPasswordRecord(JSON.stringify(newPasswordRecordArray), documentPassword)
+
+        const updateValue = {
+          encryptedData: encryptedData,
+          HMAC: HMAC
+        }
+
+        await db.passwordRecordStore.update(interactingDocumentId, updateValue)
+        dispatch(setPasswordRecordArray(newPasswordRecordArray))
+      }
+    } catch (e) {
+
+    } finally {
+      dispatch(deleteLoading(LoadingString.components_Password_EditDialog_updateData))
     }
-
-    const newValue = {
-      description: description,
-      name: name,
-      password: password
-    }
-
-    const newPasswordRecordArray = passwordRecordArray.slice();
-
-    newPasswordRecordArray[editingIndex] = newValue;
-
-    const { encryptedData, HMAC } = encryptPasswordRecord(JSON.stringify(newPasswordRecordArray), documentPassword)
-
-    const updateValue = {
-      encryptedData: encryptedData,
-      HMAC: HMAC
-    }
-
-    await db.passwordRecordStore.update(documentArray[documentIndex].id as number, updateValue)
-    dispatch(setPasswordRecordArray(newPasswordRecordArray))
-  }, [documentArray, documentIndex, passwordRecordArray, description, name, password, editingIndex, documentPassword]);
+  }, [interactingDocumentId, passwordRecordArray, description, name, password, editingIndex, documentPassword]);
 
   // ____ ____ ___ _  _ ____ _  _
   // |__/ |___  |  |  | |__/ |\ |

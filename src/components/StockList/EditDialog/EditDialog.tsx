@@ -13,7 +13,6 @@ import DoneIcon from '@mui/icons-material/Done';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 
-import { setStockList } from "components/StockList/StockList_slice";
 import { pushLoading, deleteLoading } from "components/Loading/Loading_slice";
 import { useIndexSelector, useIndexDispatch } from "components/index/index_hooks";
 import {
@@ -22,6 +21,7 @@ import {
 import { LoadingString } from "components/Loading/Loading_type";
 import { IconButton } from "@mui/material";
 import { db } from "database/db";
+import { useLiveQuery } from "dexie-react-hooks";
 
 const EditDialog = () => {
   // ____ _    ____ ___  ____ _       ____ ___ ____ ___ ____
@@ -31,16 +31,10 @@ const EditDialog = () => {
   const {
     showEditDialog,
     editDialogId,
-    documentIndex,
-    documentArray,
-    stockRecordArray,
   } = useIndexSelector((state) => {
     return {
       showEditDialog: state.stockList.editDialog.showDialog,
       editDialogId: state.stockList.editDialog.id,
-      documentIndex: state.index.documentIndex,
-      documentArray: state.Drawer.drawer.documentArray,
-      stockRecordArray: state.stockList.stockList.stockRecordArray,
     }
   })
 
@@ -57,110 +51,88 @@ const EditDialog = () => {
   // _  _ ____ ____    _  _ ____ ____ _  _ ____
   // |  | [__  |___    |__| |  | |  | |_/  [__
   // |__| ___] |___    |  | |__| |__| | \_ ___]
+  const editingStockRecord = useLiveQuery(
+    () => db.stockRecordStore.get(editDialogId),
+    [editDialogId]
+  )
+
   React.useEffect(() => {
     (async () => {
-      if (editDialogId > -1 && showEditDialog) {
-        const stockRecord = await db.stockRecordStore.get(editDialogId);
-
-        if (stockRecord === undefined) {
-          return;
-        }
-
+      if (editingStockRecord === undefined) {
+        return;
+      } else {
         setDeletePosition("0");
         setAddPrice("0");
         setAddPosition("0");
-        setUpdateName(stockRecord["name"]);
+        setUpdateName(editingStockRecord["name"]);
       }
     })()
-  }, [showEditDialog]);
+  }, [editingStockRecord]);
 
   // ____ _  _ _  _ ____ ___ _ ____ _  _ ____
   // |___ |  | |\ | |     |  | |  | |\ | [__
   // |    |__| | \| |___  |  | |__| | \| ___]
   const addStockButtonOnclick = React.useCallback(async () => {
     try {
-      dispatch(pushLoading(LoadingString.components_StockList_EditDialog_update));
+      dispatch(pushLoading(LoadingString.components_StockList_EditDialog_addStock));
 
-      if (Number(addPosition) == 0) {
+      if (Number(addPosition) === 0 || editingStockRecord === undefined) {
         return;
+      } else {
+        // Update stockRecord
+        const { price: oldPrice, position: oldPosition } = editingStockRecord;
+
+        const updateValues = {
+          price: (oldPrice * oldPosition + Number(addPrice) * Number(addPosition)) / (oldPosition + Number(addPosition)),
+          position: (oldPosition + Number(addPosition))
+        }
+
+        await db.stockRecordStore.update(editDialogId, updateValues);
       }
-
-      // Read stockRecord
-      let stockRecord = await db.stockRecordStore.get(editDialogId);
-
-      if (stockRecord === undefined) return;
-
-      // Update stockRecord
-      const { price: oldPrice, position: oldPosition } = stockRecord;
-
-      const updateValues = {
-        price: (oldPrice * oldPosition + Number(addPrice) * Number(addPosition)) / (oldPosition + Number(addPosition)),
-        position: (oldPosition + Number(addPosition))
-      }
-
-      await db.stockRecordStore.update(stockRecord.id as number, updateValues);
-
-      // Read stockArray
-      const stockRecordArray = await db.stockRecordStore
-        .where("documentId")
-        .equals(documentArray[documentIndex].id as number)
-        .toArray();
-
-      if (stockRecordArray === undefined) return;
-
-      dispatch(setStockList(stockRecordArray));
     } catch (e) {
       console.log(e);
     } finally {
-      dispatch(deleteLoading(LoadingString.components_StockList_EditDialog_update));
+      dispatch(deleteLoading(LoadingString.components_StockList_EditDialog_addStock));
     }
   }, [
     addPosition,
     addPrice,
     editDialogId,
-    documentIndex,
-    documentArray,
+    editingStockRecord,
   ]);
 
   const deleteStockButtonOnclick = React.useCallback(async () => {
     try {
       dispatch(pushLoading(LoadingString.components_StockList_EditDialog_deleteStock))
 
-      // Read stockRecord
-      const stockRecord = await db.stockRecordStore.get(editDialogId);
-
-      if (stockRecord === undefined) return;
-
-      // Delete stock
-      const updateValues = {} as {
-        price: number,
-        position: number,
-      }
-
-      if (stockRecord.position - Number(deletePosition) <= 0) {
-        updateValues.price = 0;
-        updateValues.position = 0;
+      if (editingStockRecord === undefined) {
+        return;
       } else {
-        updateValues.position = stockRecord.position - Number(deletePosition)
+        // Delete stock
+        const updateValues = {} as {
+          price: number,
+          position: number,
+        }
+
+        if (editingStockRecord.position - Number(deletePosition) <= 0) {
+          updateValues.price = 0;
+          updateValues.position = 0;
+        } else {
+          updateValues.position = editingStockRecord.position - Number(deletePosition)
+        }
+
+        await db.stockRecordStore.update(editDialogId, updateValues);
       }
-
-      await db.stockRecordStore.update(editDialogId, updateValues);
-
-      // Read stockRecordArray
-      const stockRecordArray = await db.stockRecordStore
-        .where("documentId")
-        .equals(documentArray[documentIndex].id as number)
-        .toArray();
-
-      if (stockRecordArray === undefined) return;
-
-      dispatch(setStockList(stockRecordArray));
     } catch (e) {
       console.log(e);
     } finally {
       dispatch(deleteLoading(LoadingString.components_StockList_EditDialog_deleteStock))
     }
-  }, [deletePosition, editDialogId]);
+  }, [
+    deletePosition,
+    editDialogId,
+    editingStockRecord
+  ]);
 
   const closeDialog = React.useCallback(() => {
     dispatch(setShowEditDialog(false));
@@ -173,7 +145,7 @@ const EditDialog = () => {
 
   const updateNameIconButtonOnclick = React.useCallback(async () => {
     try {
-      dispatch(pushLoading(LoadingString.components_StockList_EditDialog_update))
+      dispatch(pushLoading(LoadingString.components_StockList_EditDialog_updateName))
 
       // Update stock
       const updateValues = {
@@ -182,22 +154,13 @@ const EditDialog = () => {
 
       await db.stockRecordStore.update(editDialogId, updateValues);
 
-      // Read stockRecordArray
-      const stockRecordArray = await db.stockRecordStore
-        .where("documentId")
-        .equals(documentArray[documentIndex].id as number)
-        .toArray();
-
-      if (stockRecordArray === undefined) return;
-
       setEditingName(false);
-      dispatch(setStockList(stockRecordArray));
     } catch (e) {
       console.log(e);
     } finally {
-      dispatch(deleteLoading(LoadingString.components_StockList_EditDialog_update))
+      dispatch(deleteLoading(LoadingString.components_StockList_EditDialog_updateName))
     }
-  }, [editDialogId, updateName, documentIndex]);
+  }, [editDialogId, updateName]);
 
   // ____ ____ ___ _  _ ____ _  _
   // |__/ |___  |  |  | |__/ |\ |

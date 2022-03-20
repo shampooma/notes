@@ -1,18 +1,14 @@
 import * as React from "react"
 import { useIndexSelector, useIndexDispatch } from "components/index/index_hooks"; // Import hooks for redux, just added typing for useSelector and useDispatch
-import { db, DBPasswordRecordItem } from "database/db";
+import { db } from "database/db";
 import { useLiveQuery } from "dexie-react-hooks";
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
-import Dialog from '@mui/material/Dialog';
 import AddIcon from '@mui/icons-material/Add';
 import { LoadingString } from "components/Loading/Loading_type";
 import { pushLoading, deleteLoading } from "components/Loading/Loading_slice";
-import DialogContent from "@mui/material/DialogContent";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogActions from "@mui/material/DialogActions";
 import EditDialog from "components/Password/EditDialog/EditDialog";
 import DeleteDialog from "components/Password/DeleteDialog/DeleteDialog";
 import Item from "components/Password/Item/Item";
@@ -26,12 +22,9 @@ const Password = () => {
   // | __ |    |  | |__] |__| |       [__   |  |__|  |  |___
   // |__] |___ |__| |__] |  | |___    ___]  |  |  |  |  |___
   const dispatch = useIndexDispatch();
-  const { documentIndex, documentArray, isEditing, editingItemIndex, passwordRecordArray, documentPassword } = useIndexSelector((state) => {
+  const { interactingDocumentId, passwordRecordArray, documentPassword } = useIndexSelector((state) => {
     return {
-      documentIndex: state.index.documentIndex,
-      documentArray: state.Drawer.drawer.documentArray,
-      isEditing: state.Password.EditDialog.EditDialog.isEditing,
-      editingItemIndex: state.Password.EditDialog.EditDialog.editingIndex,
+      interactingDocumentId: state.index.interactingDocumentId,
       passwordRecordArray: state.Password.Password.passwordRecordArray,
       documentPassword: state.Password.Password.documentPassword,
     }
@@ -50,26 +43,21 @@ const Password = () => {
   // |__| ___] |___    |  | |__| |__| | \_ ___]
   const passwordRecordItem = useLiveQuery(
     () => {
-      return db.passwordRecordStore.get(documentArray[documentIndex].id as number);
+      return db.passwordRecordStore.get(interactingDocumentId);
     },
-    [documentIndex, documentArray]
+    [interactingDocumentId]
   );
 
   React.useEffect(() => {
-    if (passwordRecordItem === undefined) {
-      return;
-    } else {
-
-    }
-  }, [passwordRecordItem]);
+    dispatch(setPasswordRecordArray(undefined));
+  }, [interactingDocumentId])
 
   // ____ _  _ _  _ ____ ___ _ ____ _  _ ____
   // |___ |  | |\ | |     |  | |  | |\ | [__
   // |    |__| | \| |___  |  | |__| | \| ___]
   const centerAddButtonOnclick = React.useCallback(async () => {
-    dispatch(pushLoading(LoadingString.components_Password_Password_add));
-
     try {
+      dispatch(pushLoading(LoadingString.components_Password_Password_add));
       if (passwordRecordArray === undefined) {
         return;
       }
@@ -89,49 +77,66 @@ const Password = () => {
         HMAC: HMAC
       }
 
-      await db.passwordRecordStore.update(documentArray[documentIndex].id as number, updateValue)
+      await db.passwordRecordStore.update(interactingDocumentId, updateValue)
       dispatch(setPasswordRecordArray(newPasswordRecordArray))
     } catch (e) {
       console.log(e);
     } finally {
       dispatch(deleteLoading(LoadingString.components_Password_Password_add))
     }
-  }, [documentArray, documentIndex, documentPassword, passwordRecordArray]);
+  }, [interactingDocumentId, documentPassword, passwordRecordArray]);
 
   const setPasswordDialogButtonOnclick = React.useCallback(async () => {
-    if (confirmPassword !== targetPassword || targetPassword === "") {
-      return;
-    } else {
-      const { encryptedData, HMAC } = encryptPasswordRecord(JSON.stringify([]), targetPassword);
+    try {
+      dispatch(deleteLoading(LoadingString.components_Password_Password_setPassword))
 
-      await db.passwordRecordStore.add({
-        documentId: documentArray[documentIndex].id as number,
-        encryptedData: encryptedData,
-        HMAC: HMAC,
-      })
+
+      if (confirmPassword !== targetPassword || targetPassword === "" || interactingDocumentId === undefined) {
+        return;
+      } else {
+        const { encryptedData, HMAC } = encryptPasswordRecord(JSON.stringify([]), targetPassword);
+
+        await db.passwordRecordStore.add({
+          documentId: interactingDocumentId,
+          encryptedData: encryptedData,
+          HMAC: HMAC,
+        })
+      }
+    } catch (e) {
+      console.log(e)
+    } finally {
+      dispatch(deleteLoading(LoadingString.components_Password_Password_setPassword))
     }
-  }, [confirmPassword, targetPassword, documentIndex, documentArray])
+  }, [confirmPassword, targetPassword, interactingDocumentId])
 
   const decryptPasswordRecordDialogButtonOnclick = React.useCallback(async () => {
-    const passwordRecord = await db.passwordRecordStore.get(documentArray[documentIndex].id as number);
+    try {
+      dispatch(deleteLoading(LoadingString.components_Password_Password_decrypt))
 
-    if (passwordRecord === undefined) {
-      return;
+      const passwordRecord = await db.passwordRecordStore.get(interactingDocumentId);
+
+      if (passwordRecord === undefined) {
+        return;
+      } else {
+        const { error, data } = decryptPasswordRecord(
+          passwordRecord.encryptedData,
+          passwordRecord.HMAC,
+          decryptPassword
+        )
+
+        if (error) {
+          setDecryptPasswordError(true);
+        } else {
+          dispatch(setDocumentPassword(decryptPassword));
+          dispatch(setPasswordRecordArray(JSON.parse(data)));
+        }
+      }
+    } catch (e) {
+      console.log(e)
+    } finally {
+      dispatch(deleteLoading(LoadingString.components_Password_Password_decrypt))
     }
-
-    const { error, data } = decryptPasswordRecord(
-      passwordRecord.encryptedData,
-      passwordRecord.HMAC,
-      decryptPassword
-    )
-
-    if (error) {
-      setDecryptPasswordError(true);
-    } else {
-      dispatch(setDocumentPassword(decryptPassword));
-      dispatch(setPasswordRecordArray(JSON.parse(data)));
-    }
-  }, [decryptPassword, documentIndex, documentArray])
+  }, [decryptPassword, interactingDocumentId])
 
   // ____ ____ ___ _  _ ____ _  _
   // |__/ |___  |  |  | |__/ |\ |
@@ -157,6 +162,7 @@ const Password = () => {
             label="Target password"
             value={targetPassword}
             variant="standard"
+            type="password"
             onChange={(e) => setTargetPassword(e.target.value)}
           />
           <TextField
@@ -164,6 +170,7 @@ const Password = () => {
             label="Confirm password"
             value={confirmPassword}
             variant="standard"
+            type="password"
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
         </Box>
@@ -182,36 +189,42 @@ const Password = () => {
     </>
   } else if (passwordRecordArray === undefined) { // Cannot decrypt password record data
     return <>
-
-      <Box>
-        Enter password for this document
-      </Box>
-
       <Box
         sx={{
-          display: "flex",
-          flexDirection: 'column'
+          px: 3
         }}
       >
-        <TextField
-          error={decryptPasswordError}
-          label="Password"
-          value={decryptPassword}
-          variant="standard"
-          onChange={(e) => setDecryptPassword(e.target.value)}
-        />
-      </Box>
+        <Box>
+          <h1>Enter password for this document</h1>
+        </Box>
 
-      <Box
-        display="flex"
-        justifyContent="center"
-        style={{
-          width: "100%"
-        }}
-      >
-        <Button onClick={decryptPasswordRecordDialogButtonOnclick}>
-          Confirm
-        </Button>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: 'column'
+          }}
+        >
+          <TextField
+            error={decryptPasswordError}
+            label="Password"
+            value={decryptPassword}
+            variant="standard"
+            type="password"
+            onChange={(e) => setDecryptPassword(e.target.value)}
+          />
+        </Box>
+
+        <Box
+          display="flex"
+          justifyContent="center"
+          style={{
+            width: "100%"
+          }}
+        >
+          <Button onClick={decryptPasswordRecordDialogButtonOnclick}>
+            Confirm
+          </Button>
+        </Box>
       </Box>
     </>
   } else { // Successfully logged in
