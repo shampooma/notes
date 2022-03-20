@@ -13,6 +13,7 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { encryptPasswordRecord } from "components/Password/Password_tools";
 import { setPasswordRecordArray, setDocumentPassword } from "components/Password/Password_slice";
+import { pushNotificationArray } from "components/Stackbar/Stackbar_slice";
 
 const EditDialog = () => {
   // ____ _    ____ ___  ____ _       ____ ___ ____ ___ ____
@@ -60,9 +61,20 @@ const EditDialog = () => {
     try {
       dispatch(pushLoading(LoadingString.components_Password_EditDialog_updateData));
 
-      if (passwordRecordArray === undefined || documentPassword === "" || editingIndex < 0) {
+      if (passwordRecordArray === undefined) {
+        // Error stackbar
+        dispatch(pushNotificationArray({ message: "Haven't decrypt password record", variant: "error" }))
+        return
+      } else if (documentPassword === "") {
+        // Error stackbar
+        dispatch(pushNotificationArray({ message: "Haven't enter password", variant: "error" }))
+        return
+      } else if (editingIndex < 0) {
+        // Error stackbar
+        dispatch(pushNotificationArray({ message: "Haven't select password record data to be edit", variant: "error" }))
         return;
       } else {
+        // Calculate edit values
         const newValue = {
           description: description,
           name: name,
@@ -80,11 +92,19 @@ const EditDialog = () => {
           HMAC: HMAC
         }
 
+        // Edit password record data
         await db.passwordRecordStore.update(interactingDocumentId, updateValue)
         dispatch(setPasswordRecordArray(newPasswordRecordArray))
+
+        // Success stackbar
+        dispatch(pushNotificationArray({ message: "Success to edit password record data", variant: "success" }))
+        return
       }
     } catch (e) {
+      console.log(e);
 
+      // Error stackbar
+      dispatch(pushNotificationArray({ message: "Failed to edit password record data", variant: "error"}))
     } finally {
       dispatch(deleteLoading(LoadingString.components_Password_EditDialog_updateData))
     }

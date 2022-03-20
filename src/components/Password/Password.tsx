@@ -15,7 +15,7 @@ import Item from "components/Password/Item/Item";
 import List from "@mui/material/List";
 import { setPasswordRecordArray, setDocumentPassword } from "components/Password/Password_slice";
 import { encryptPasswordRecord, decryptPasswordRecord } from "components/Password/Password_tools";
-
+import { pushNotificationArray } from "components/Stackbar/Stackbar_slice";
 
 const Password = () => {
   // ____ _    ____ ___  ____ _       ____ ___ ____ ___ ____
@@ -58,29 +58,41 @@ const Password = () => {
   const centerAddButtonOnclick = React.useCallback(async () => {
     try {
       dispatch(pushLoading(LoadingString.components_Password_Password_add));
+
       if (passwordRecordArray === undefined) {
+        // Error stackbar
+        dispatch(pushNotificationArray({ message: "Haven't decrypt password record", variant: "error"}))
         return;
+      } else {
+        // Calculate update values
+        const newPasswordItem = {
+          description: "description",
+          name: "name",
+          password: "password",
+        }
+
+        const newPasswordRecordArray = [...passwordRecordArray, newPasswordItem]
+
+        const { encryptedData, HMAC } = encryptPasswordRecord(JSON.stringify(newPasswordRecordArray), documentPassword)
+
+        const updateValue = {
+          encryptedData: encryptedData,
+          HMAC: HMAC
+        }
+
+        // Update password record
+        await db.passwordRecordStore.update(interactingDocumentId, updateValue)
+        dispatch(setPasswordRecordArray(newPasswordRecordArray))
+
+        // Success stackbar
+        dispatch(pushNotificationArray({ message: "Success to add password record", variant: "success"}))
+        return
       }
-
-      const newPasswordItem = {
-        description: "description",
-        name: "name",
-        password: "password",
-      }
-
-      const newPasswordRecordArray = [...passwordRecordArray, newPasswordItem]
-
-      const { encryptedData, HMAC } = encryptPasswordRecord(JSON.stringify(newPasswordRecordArray), documentPassword)
-
-      const updateValue = {
-        encryptedData: encryptedData,
-        HMAC: HMAC
-      }
-
-      await db.passwordRecordStore.update(interactingDocumentId, updateValue)
-      dispatch(setPasswordRecordArray(newPasswordRecordArray))
     } catch (e) {
       console.log(e);
+
+      // Error stackbar
+      dispatch(pushNotificationArray({ message: "Failed to add password record", variant: "error"}))
     } finally {
       dispatch(deleteLoading(LoadingString.components_Password_Password_add))
     }
@@ -90,20 +102,38 @@ const Password = () => {
     try {
       dispatch(deleteLoading(LoadingString.components_Password_Password_setPassword))
 
-
-      if (confirmPassword !== targetPassword || targetPassword === "" || interactingDocumentId === undefined) {
-        return;
+      if (confirmPassword !== targetPassword) {
+        // Error stackbar
+        dispatch(pushNotificationArray({ message: "Password mismatch", variant: "error"}))
+        return
+      } else if (targetPassword === "") {
+        // Error stackbar
+        dispatch(pushNotificationArray({ message: "Password cannot be empty", variant: "error"}))
+        return
+      } else if (interactingDocumentId === undefined) {
+        // Error stackbar
+        dispatch(pushNotificationArray({ message: "Not interacting with a document", variant: "error"}))
+        return
       } else {
+        // Encrypt password record data
         const { encryptedData, HMAC } = encryptPasswordRecord(JSON.stringify([]), targetPassword);
 
+        // Add password record
         await db.passwordRecordStore.add({
           documentId: interactingDocumentId,
           encryptedData: encryptedData,
           HMAC: HMAC,
         })
+
+        // Success stackbar
+        dispatch(pushNotificationArray({ message: "Success to set password", variant: "success"}))
+        return
       }
     } catch (e) {
-      console.log(e)
+      console.log(e);
+
+      // Error stackbar
+      dispatch(pushNotificationArray({ message: "Failed to set password", variant: "error"}))
     } finally {
       dispatch(deleteLoading(LoadingString.components_Password_Password_setPassword))
     }
@@ -116,8 +146,11 @@ const Password = () => {
       const passwordRecord = await db.passwordRecordStore.get(interactingDocumentId);
 
       if (passwordRecord === undefined) {
-        return;
+        // Error stackbar
+        dispatch(pushNotificationArray({ message: "Don't have this password record", variant: "error"}))
+        return
       } else {
+        // Try to decrypt password record
         const { error, data } = decryptPasswordRecord(
           passwordRecord.encryptedData,
           passwordRecord.HMAC,
@@ -126,13 +159,24 @@ const Password = () => {
 
         if (error) {
           setDecryptPasswordError(true);
+
+          // Error stackbar
+          dispatch(pushNotificationArray({ message: "Failed to decrypt password record", variant: "error"}))
+          return;
         } else {
           dispatch(setDocumentPassword(decryptPassword));
           dispatch(setPasswordRecordArray(JSON.parse(data)));
+
+          // Success stackbar
+          dispatch(pushNotificationArray({ message: "Success to decrypt password record", variant: "success"}))
+          return
         }
       }
     } catch (e) {
       console.log(e)
+
+      // Error stackbar
+      dispatch(pushNotificationArray({ message: "Failed to decrypt password record", variant: "error"}))
     } finally {
       dispatch(deleteLoading(LoadingString.components_Password_Password_decrypt))
     }

@@ -1,5 +1,5 @@
 <p align="center">
-  <img alt="" src="../src/images/icon.png" width="60" />
+  <img alt="" src="../src/images/formal_note.png" width="60" />
 </p>
 
 <h1 align="center">Notes</h1>
@@ -145,6 +145,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { setState0 } from "others/Component0_slice"; // Import redux actions
 import { LoadingString } from "components/Loading/Loading_type";
 import { pushLoading, deleteLoading } from "components/Loading/Loading_slice";
+import { pushNotificationArray } from "components/Stackbar/Stackbar_slice";
 
 const Component1 = ({ // Define parameters and corresponding data type
   variable1,
@@ -188,6 +189,7 @@ const Component1 = ({ // Define parameters and corresponding data type
   const function0 = React.useCallback(async () => {
     try {
     } catch (e) {
+      console.log(e)
     } finally {
     }
   }, []); // use Callback to reduce computation when re-render
@@ -222,8 +224,14 @@ Using Dexie
    try {
     dispatch(pushLoading(LoadingString.string))
     await db.store.get(0);
+
+    // Success stackbar
+    dispatch(pushNotificationArray({ message: "Success", variant: "success"}))
    } catch (e) {
      console.log(e);
+
+     // Error stackbar
+     dispatch(pushNotificationArray({ message: "Failed", variant: "error"}))
    } finally {
      dispatch(deleteLoading(LoadingString.string))
    }

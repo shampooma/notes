@@ -16,6 +16,7 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContentText from "@mui/material/DialogContentText";
 import { db, DBDocumentStoreItem, DBDocumentTypeEnum } from "database/db";
 import { setDocumentArray } from 'components/Drawer/Drawer_slice';
+import { pushNotificationArray } from "components/Stackbar/Stackbar_slice";
 
 const DocumentItem = ({
   item,
@@ -81,8 +82,11 @@ const DocumentItem = ({
       dispatch(pushLoading(LoadingString.components_Drawer_DocumentItem_deleteDocument));
 
       if (item.id === undefined) {
+        // Error stackbar
+        dispatch(pushNotificationArray({ message: "Haven't select document to be delete", variant: "error" }))
         return;
       } else {
+        // Delete data
         switch (item.type) {
           case DBDocumentTypeEnum.stock:
             await db.stockRecordStore
@@ -95,17 +99,27 @@ const DocumentItem = ({
             break;
         }
 
+        // Delete document record
         await db.documentStore.delete(item.id);
 
+        // Set interacting document id if the current interacting document have been delete
         if (item.id === interactingDocumentId) {
           dispatch(setInteractingDocumentId(-1));
         }
 
+        // Set document array
         const documentArray = await db.documentStore.toArray();
         dispatch(setDocumentArray(documentArray))
+
+        // Success stackbar
+        dispatch(pushNotificationArray({ message: "Success to delete document record", variant: "success" }))
+        return
       }
     } catch (e) {
       console.log(e);
+
+      // Error stackbar
+      dispatch(pushNotificationArray({ message: "Failed to delete document record", variant: "error"}))
     } finally {
       setShowDeleteWarning(false);
       dispatch(deleteLoading(LoadingString.components_Drawer_DocumentItem_deleteDocument));

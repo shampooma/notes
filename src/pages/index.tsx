@@ -10,6 +10,7 @@ import Box from '@mui/material/Box';
 import { LoadingString } from "components/Loading/Loading_type";
 import { pushLoading, deleteLoading } from "components/Loading/Loading_slice";
 import { useLiveQuery } from "dexie-react-hooks";
+import Stackbar from "components/Stackbar/Stackbar";
 
 const IndexPage = () => {
   // ____ _    ____ ___  ____ _       ____ ___ ____ ___ ____
@@ -96,6 +97,7 @@ const IndexPage = () => {
   return (<>
     <Loading />
     <Drawer />
+    <Stackbar />
     <PageContent />
   </>)
 }
