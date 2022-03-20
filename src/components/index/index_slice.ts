@@ -4,7 +4,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 export const indexSlice = createSlice({
   name: 'index',
   initialState: {
-    documentIndex: -1, 
+    documentIndex: -1,
   } as {
     documentIndex: number,
   },

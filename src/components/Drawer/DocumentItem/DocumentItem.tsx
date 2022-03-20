@@ -19,19 +19,20 @@ import { db, DBDocumentStoreItem, DBDocumentTypeEnum } from "database/db";
 
 const DocumentItem = ({
   item,
-  i
+  index
 }: {
   item: DBDocumentStoreItem,
-  i: number
+  index: number
 }) => {
   // ____ _    ____ ___  ____ _       ____ ___ ____ ___ ____
   // | __ |    |  | |__] |__| |       [__   |  |__|  |  |___
   // |__] |___ |__| |__] |  | |___    ___]  |  |  |  |  |___
   const dispatch = useIndexDispatch();
-  const { editingDocumentArray, documentArray } = useIndexSelector((state) => {
+  const { editingDocumentArray, documentArray, interactingDocumentIndex } = useIndexSelector((state) => {
     return {
       editingDocumentArray: state.Drawer.editDrawerArray.editingDocumentArray,
       documentArray: state.Drawer.drawer.documentArray,
+      interactingDocumentIndex: state.index.documentIndex
     }
   });
 
@@ -49,10 +50,10 @@ const DocumentItem = ({
   // |    |__| | \| |___  |  | |__| | \| ___]
   const itemOnclick = React.useCallback(() => {
     if (editingDocumentArray) {
-      dispatch(setArrayIndex(i));
+      dispatch(setArrayIndex(index));
       dispatch(setEditingDocumentItem(true));
     } else {
-      dispatch(setDocumentIndex(i));
+      dispatch(setDocumentIndex(index));
     }
   }, [editingDocumentArray]);
 
@@ -80,8 +81,19 @@ const DocumentItem = ({
     dispatch(pushLoading(LoadingString.components_Drawer_DocumentItem_deleteDocument));
 
     try {
-      await db.documentStore.delete(documentArray[i].id as number);
+      switch (documentArray[index].type) {
+        case DBDocumentTypeEnum.stock:
+          await db.stockRecordStore
+            .where("documentId")
+            .equals(documentArray[index].id as number)
+            .delete();
+          break;
+        case DBDocumentTypeEnum.password:
+          await db.passwordRecordStore.delete(documentArray[index].id as number)
+          break;
+      }
 
+      await db.documentStore.delete(documentArray[index].id as number);
       const documents = await db.documentStore.toArray();
 
       dispatch(setDocumentIndex(-1));
@@ -102,7 +114,7 @@ const DocumentItem = ({
       >
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Confirm to delete {documentArray[i].name}?
+            Confirm to delete {documentArray[index].name}?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -122,7 +134,10 @@ const DocumentItem = ({
 
       <Box
         sx={{ display: 'flex' }}
-        key={i}
+        key={index}
+        style={{
+          backgroundColor: interactingDocumentIndex === index ? "#efe" : "#fff"
+        }}
       >
 
         <DeleteButtonElement />
