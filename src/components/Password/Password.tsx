@@ -17,51 +17,9 @@ import EditDialog from "components/Password/EditDialog/EditDialog";
 import DeleteDialog from "components/Password/DeleteDialog/DeleteDialog";
 import Item from "components/Password/Item/Item";
 import List from "@mui/material/List";
-import * as CryptoJS from "crypto-js";
 import { setPasswordRecordArray, setDocumentPassword } from "components/Password/Password_slice";
+import { encryptPasswordRecord, decryptPasswordRecord } from "components/Password/Password_tools";
 
-export const encryptPasswordRecord = (message: string, password: string) => {
-  const encryptedData = CryptoJS.AES.encrypt(
-    JSON.stringify(message),
-    password,
-    {
-      mode: CryptoJS.mode.CTR
-    })
-    .toString();
-
-  const HMAC = CryptoJS.HmacSHA512(encryptedData, password).toString();
-
-  return {
-    encryptedData: encryptedData,
-    HMAC: HMAC
-  }
-}
-
-export const decryptPasswordRecord = (encryptedData: string, targetHMAC: string, password: string) => {
-  const returnValue = {
-    error: 1,
-    data: "",
-  }
-
-  const compareHMAC = CryptoJS.HmacSHA512(encryptedData, password).toString();
-
-  if (compareHMAC !== targetHMAC) {
-    return returnValue
-  } else {
-    const data = CryptoJS.AES.decrypt(
-      encryptedData,
-      password,
-      {
-        mode: CryptoJS.mode.CTR
-      })
-      .toString(CryptoJS.enc.Utf8);
-
-    returnValue["error"] = 0;
-    returnValue["data"] = JSON.parse(data);
-
-    return returnValue
-  }
-}
 
 const Password = () => {
   // ____ _    ____ ___  ____ _       ____ ___ ____ ___ ____
@@ -180,43 +138,47 @@ const Password = () => {
   // |  \ |___  |  |__| |  \ | \|
   if (passwordRecordItem === undefined) { // Haven't set password || password have been deleted
     return <>
-      <Box>
-        <h1>Enter password for 1st creation</h1>
-      </Box>
       <Box
         sx={{
-          display: "flex",
-          flexDirection: 'column'
+          px: 3
         }}
       >
+        <Box>
+          <h1>Enter password for 1st creation</h1>
+        </Box>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: 'column'
+          }}
+        >
 
-        <TextField
-          label="Target password"
-          value={targetPassword}
-          variant="standard"
-          onChange={(e) => setTargetPassword(e.target.value)}
-        />
-        <TextField
-          error={confirmPassword !== targetPassword}
-          label="Confirm password"
-          value={confirmPassword}
-          variant="standard"
-          onChange={(e) => setConfirmPassword(e.target.value)}
-        />
+          <TextField
+            label="Target password"
+            value={targetPassword}
+            variant="standard"
+            onChange={(e) => setTargetPassword(e.target.value)}
+          />
+          <TextField
+            error={confirmPassword !== targetPassword}
+            label="Confirm password"
+            value={confirmPassword}
+            variant="standard"
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
+        </Box>
+        <Box
+          display="flex"
+          justifyContent="center"
+          style={{
+            width: "100%"
+          }}
+        >
+          <Button onClick={setPasswordDialogButtonOnclick}>
+            Confirm
+          </Button>
+        </Box>
       </Box>
-
-      <Box
-        display="flex"
-        justifyContent="center"
-        style={{
-          width: "100%"
-        }}
-      >
-        <Button onClick={setPasswordDialogButtonOnclick}>
-          Confirm
-        </Button>
-      </Box>
-
     </>
   } else if (passwordRecordArray === undefined) { // Cannot decrypt password record data
     return <>

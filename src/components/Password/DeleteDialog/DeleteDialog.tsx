@@ -8,7 +8,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContentText from "@mui/material/DialogContentText";
 import Box from "@mui/material/Box";
-import { encryptPasswordRecord } from "components/Password/Password";
+import { encryptPasswordRecord } from "components/Password/Password_tools";
 import { setPasswordRecordArray } from "components/Password/Password_slice";
 import { setDeletingIndex } from "components/Password/DeleteDialog/DeleteDialog_slice";
 
@@ -77,31 +77,33 @@ const DeleteDialog = () => {
     return <></>;
   } else {
     console.log(deletingIndex)
-    return (<>
-      <Dialog
-        open={isDeleting}
-        onClose={() => dispatch(setIsDeleting(false))}
-      >
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Confirm to delete password with name {passwordRecordArray[deletingIndex].name}?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Box
-            display="flex"
-            justifyContent="center"
-            style={{
-              width: "100%"
-            }}
-          >
-            <Button onClick={confirmOnClick} color="error">
-              Confirm
-            </Button>
-          </Box>
-        </DialogActions>
-      </Dialog>
-    </>);
+    return (
+      <>
+        <Dialog
+          open={isDeleting}
+          onClose={() => dispatch(setIsDeleting(false))}
+        >
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              Confirm to delete password with name {passwordRecordArray[deletingIndex].name}?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Box
+              display="flex"
+              justifyContent="center"
+              style={{
+                width: "100%"
+              }}
+            >
+              <Button onClick={confirmOnClick} color="error">
+                Confirm
+              </Button>
+            </Box>
+          </DialogActions>
+        </Dialog>
+      </>
+    );
   }
 }
 

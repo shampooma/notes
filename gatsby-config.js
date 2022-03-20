@@ -17,7 +17,7 @@ module.exports = {
         background_color: `#fdfffd`,
         theme_color: `#fdfffd`,
         display: `standalone`,
-        icon: `src/images/icon.png`,
+        icon: `src/images/formal_note.png`,
       },
     },
     {

@@ -10,8 +10,6 @@ import Box from "@mui/material/Box";
 import { setCreatingDocument } from "components/Drawer/NewDocumentDialog/NewDocumentDialog_slice";
 import { pushLoading, deleteLoading } from "components/Loading/Loading_slice";
 import { LoadingString } from 'components/Loading/Loading_type';
-import ImageList from '@mui/material/ImageList';
-import ImageListItem from '@mui/material/ImageListItem';
 import ImageListItemBar from '@mui/material/ImageListItemBar';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import KeyIcon from '@mui/icons-material/Key';
@@ -117,6 +115,7 @@ const NewDocumentDialog = () => {
     <DialogContent
 
     >
+      <h5>Type:</h5>
       <Box
         display="flex"
         justifyContent="center"
