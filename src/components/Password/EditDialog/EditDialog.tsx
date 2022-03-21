@@ -125,6 +125,7 @@ const EditDialog = () => {
           variant="standard"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
+          onKeyDown={e=>e.key==="Enter"&&updateButtonOnclick()}
         />
       </div>
       <div><TextField
@@ -133,6 +134,7 @@ const EditDialog = () => {
         variant="standard"
         value={name}
         onChange={(e) => setName(e.target.value)}
+        onKeyDown={e=>e.key==="Enter"&&updateButtonOnclick()}
       />
       </div>
       <div><TextField
@@ -141,6 +143,7 @@ const EditDialog = () => {
         variant="standard"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
+        onKeyDown={e=>e.key==="Enter"&&updateButtonOnclick()}
       />
       </div>
     </DialogContent>

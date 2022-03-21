@@ -229,6 +229,7 @@ const EditDialog = () => {
             onChange={(e) => {
               setUpdateName(e.target.value);
             }}
+            onKeyDown={e=>e.key==="Enter"&&editingName&&updateNameIconButtonOnclick()}
           />
           <IconButton
             onClick={editingName ? updateNameIconButtonOnclick : editNameIconButtonOnclick}
@@ -269,6 +270,7 @@ const EditDialog = () => {
                       setAddPrice(e.target.value);
                     }
                   }}
+                  onKeyDown={e=>e.key==="Enter"&&addStockButtonOnclick()}
                 />
               </div>
               <div>
@@ -285,6 +287,7 @@ const EditDialog = () => {
                       setAddPosition(e.target.value);
                     }
                   }}
+                  onKeyDown={e=>e.key==="Enter"&&addStockButtonOnclick()}
                 />
               </div>
             </> :
@@ -303,6 +306,7 @@ const EditDialog = () => {
                       setDeletePosition(e.target.value);
                     }
                   }}
+                  onKeyDown={e=>e.key==="Enter"&&deleteStockButtonOnclick()}
                 />
               </div>
             </>

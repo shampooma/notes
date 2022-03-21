@@ -17,6 +17,7 @@ import ShowChartIcon from '@mui/icons-material/ShowChart';
 import KeyIcon from '@mui/icons-material/Key';
 import Card from '@mui/material/Card';
 import TextField from '@mui/material/TextField';
+import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import CardActionArea from '@mui/material/CardActionArea';
@@ -30,6 +31,10 @@ const selectDocumentArray = [
   {
     icon: KeyIcon,
     title: "Password Record",
+  },
+  {
+    icon: PlaylistAddCheckIcon,
+    title: "Todo Record",
   }
 ]
 
@@ -95,13 +100,13 @@ const NewDocumentDialog = () => {
       dispatch(setCreatingDocument(false));
 
       // Success stackbar
-      dispatch(pushNotificationArray({ message: "Success to add document record", variant: "success"}))
+      dispatch(pushNotificationArray({ message: "Success to add document record", variant: "success" }))
       return
     } catch (e) {
       console.log(e);
 
       // Error stackbar
-      dispatch(pushNotificationArray({ message: "Failed to add document record", variant: "error"}))
+      dispatch(pushNotificationArray({ message: "Failed to add document record", variant: "error" }))
     } finally {
       dispatch(deleteLoading(LoadingString.components_Drawer_Drawer_addDocument));
     }
@@ -114,7 +119,7 @@ const NewDocumentDialog = () => {
     open={creatingDocument}
     onClose={closeDialog}
     fullWidth
-    maxWidth="sm"
+    maxWidth="xl"
   >
     <DialogTitle>
       <TextField
@@ -126,45 +131,45 @@ const NewDocumentDialog = () => {
         style={{ width: "100%" }}
       />
     </DialogTitle>
-    <DialogContent
-
-    >
+    <DialogContent>
       <h5>Type:</h5>
       <Box
         display="flex"
         justifyContent="center"
       >
-        {selectDocumentArray.map((item, i) => (
-          <Card
-            key={i}
-            style={{
-              width: "300px",
-              margin: "10px",
-              display: 'inline-block'
-            }}
-          >
-            <CardActionArea
-              style={{ backgroundColor: documentType == i ? "#efe" : "#fff" }}
-              onClick={() => documentCardOnClick(i)}
+        <Box>
+          {selectDocumentArray.map((item, i) => (
+            <Card
+              key={i}
+              style={{
+                width: "300px",
+                margin: "10px",
+                display: "inline-block"
+              }}
             >
-              <CardMedia>
-                <Box
-                  display="flex"
-                  justifyContent="center"
-                >
-                  <item.icon style={{ fontSize: 100 }} />
-                </Box>
-              </CardMedia>
-              <CardContent>
-                <ImageListItemBar
-                  align="center"
-                  title={item.title}
-                  position="below"
-                />
-              </CardContent>
-            </CardActionArea>
-          </Card>
-        ))}
+              <CardActionArea
+                style={{ backgroundColor: documentType == i ? "#efe" : "#fff" }}
+                onClick={() => documentCardOnClick(i)}
+              >
+                <CardMedia>
+                  <Box
+                    display="flex"
+                    justifyContent="center"
+                  >
+                    <item.icon style={{ fontSize: 100 }} />
+                  </Box>
+                </CardMedia>
+                <CardContent>
+                  <ImageListItemBar
+                    align="center"
+                    title={item.title}
+                    position="below"
+                  />
+                </CardContent>
+              </CardActionArea>
+            </Card>
+          ))}
+        </Box>
       </Box>
     </DialogContent>
     <DialogActions>
