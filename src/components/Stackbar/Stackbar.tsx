@@ -19,7 +19,7 @@ const StackbarApp = () => {
     } else {
       enqueueSnackbar(notificationArray[0].message, {
         anchorOrigin: {
-          vertical: 'bottom',
+          vertical: 'top',
           horizontal: 'center',
         },
         ransitionComponent: Grow,
