@@ -5,6 +5,7 @@ import { DrawerReducer } from "components/Drawer/Drawer_slice";
 import { LoadingReducer } from "components/Loading/Loading_slice";
 import { PasswordReducer } from "components/Password/Password_slice";
 import { StackbarReducer } from "components/Stackbar/Stackbar_slice";
+import { TodoReducer } from "components/Todo/Todo_slice"
 
 const configureStoreArgument = {
   reducer: {
@@ -14,6 +15,7 @@ const configureStoreArgument = {
     Loading: LoadingReducer,
     Password: PasswordReducer,
     Stackbar: StackbarReducer,
+    Todo: TodoReducer,
   },
   // type of getDefaultMiddleware any as I don't know how to set
   middleware: (getDefaultMiddleware: any) => getDefaultMiddleware({

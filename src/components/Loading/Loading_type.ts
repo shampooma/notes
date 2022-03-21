@@ -16,4 +16,7 @@ export enum LoadingString {
   components_Password_Password_decrypt,
   components_Password_EditDialog_updateData,
   components_Password_DeleteDialog_deleteData,
+  components_Todo_Todo_add,
+  components_Todo_EditDialog_editThing,
+  components_Todo_TodoItem_delete
 }

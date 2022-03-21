@@ -216,13 +216,13 @@ const Password = () => {
             flexDirection: 'column'
           }}
         >
-
           <TextField
             label="Target password"
             value={targetPassword}
             variant="standard"
             type="password"
             onChange={(e) => setTargetPassword(e.target.value)}
+            onKeyDown={e=>e.key==="Enter"&&setPasswordDialogButtonOnclick()}
           />
           <TextField
             error={confirmPassword !== targetPassword}
@@ -231,6 +231,7 @@ const Password = () => {
             variant="standard"
             type="password"
             onChange={(e) => setConfirmPassword(e.target.value)}
+            onKeyDown={e=>e.key==="Enter"&&setPasswordDialogButtonOnclick()}
           />
         </Box>
         <Box
@@ -270,6 +271,7 @@ const Password = () => {
             variant="standard"
             type="password"
             onChange={(e) => setDecryptPassword(e.target.value)}
+            onKeyDown={e=>e.key==="Enter"&&decryptPasswordRecordDialogButtonOnclick()}
           />
         </Box>
 

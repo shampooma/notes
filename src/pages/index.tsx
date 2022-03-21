@@ -2,6 +2,7 @@ import Drawer from "components/Drawer/Drawer";
 import Loading from "components/Loading/Loading";
 import StockList from "components/StockList/StockList";
 import Password from "components/Password/Password";
+import Todo from "components/Todo/Todo";
 import { db, DBDocumentTypeEnum } from "database/db";
 import { useIndexSelector, useIndexDispatch } from "components/index/index_hooks";
 import { setInteractingDocumentId, } from "components/index/index_slice";
@@ -81,7 +82,9 @@ const IndexPage = () => {
           break;
         case DBDocumentTypeEnum.password:
           Component = <Password />
-
+          break;
+        case DBDocumentTypeEnum.todo:
+          Component = <Todo />
           break;
         default:
           Component = <></>

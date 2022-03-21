@@ -107,6 +107,7 @@ const EditDrawerArray = () => {
             onChange={(e) => {
               setEditingDocumentItemName(e.target.value);
             }}
+            onKeyDown={e=>e.key==="Enter"&&saveButtonOnclick()}
           />
         </DialogTitle>
       </Box>

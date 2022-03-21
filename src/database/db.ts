@@ -20,9 +20,24 @@ export interface DBPasswordRecordItem {
   HMAC: string,
 }
 
+export enum DBTodoRecordStatus {
+  "pending",
+  "done",
+  "failed",
+  "progress"
+}
+
+export interface DBTodoRecord {
+  id?: number,
+  documentId: number,
+  thing: string,
+  status: DBTodoRecordStatus
+}
+
 export enum DBDocumentTypeEnum {
   "stock",
   "password",
+  "todo"
 }
 
 export interface DBDocumentStoreItem {
@@ -35,6 +50,7 @@ export interface DBDocumentStoreItem {
 //   stockRecordStore!: Table<DBStockRecord>;
 //   passwordRecordStore!: Table<DBPasswordRecordItem>;
 //   documentStore!: Table<DBDocumentStoreItem>;
+//   todoRecordStore!: Table<DBTodoRecord>;
 
 //   constructor() {
 //     super('NoteDb');
@@ -43,6 +59,11 @@ export interface DBDocumentStoreItem {
 //       passwordRecordStore: 'documentId',
 //       documentStore: '++id',
 //     });
+
+//     this.version(2).stores({
+//       todoRecordStore: '++id, documentId'
+//     })
+
 //   }
 // }
 
@@ -55,3 +76,7 @@ db.version(1).stores({
   passwordRecordStore: 'documentId',
   documentStore: '++id',
 });
+
+db.version(2).stores({
+  todoRecordStore: '++id, documentId'
+})
